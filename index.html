@@ -133,9 +133,7 @@
     font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
     color: var(--tan-text); font-size: 15px; letter-spacing: 0.06em;
     text-shadow: 0 2px 8px rgba(0,0,0,0.6);
-    opacity: 0; transition: opacity 1s ease 0.5s;
   }
-  .intro-tagline.intro-tagline-show { opacity: 1; }
   /* ③動画だけのキャッチコピー（本人指定・2026-09-06：コラージュ見出し用の一文をここへ移動） */
   .intro-video-caption {
     position: absolute; left: 50%; bottom: 14%; transform: translateX(-50%);
@@ -144,9 +142,19 @@
     color: var(--gold); font-size: clamp(20px, 3.2vw, 32px); letter-spacing: 0.05em;
     line-height: 1.6;
     text-shadow: 0 2px 14px rgba(0,0,0,0.7);
-    opacity: 0; transition: opacity 1.2s ease 0.4s;
   }
-  .intro-video-caption.intro-video-caption-show { opacity: 1; }
+  /* ②③共通：文字を1文字ずつ順番にゆっくり表示する演出（本人指定・2026-09-08）。
+     「絶対に見せる」演出ではなく、自然に読み進めるうちに次（④3枚の写真）へ
+     気持ちが向くようにするための間（ま）。JSがテキストを1文字ずつ<span>に
+     分割し、transition-delayをずらして設定する（wrapCharsReveal関数）。 */
+  .intro-tagline .char, .intro-video-caption .char {
+    display: inline-block; opacity: 0; transform: translateY(8px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+  .intro-tagline.intro-tagline-show .char,
+  .intro-video-caption.intro-video-caption-show .char {
+    opacity: 1; transform: translateY(0);
+  }
 
   .intro-gate {
     position: absolute; top: 0; bottom: 0; width: 50%; z-index: 2;
@@ -367,10 +375,33 @@
   var hero = intro.querySelector('.intro-hero');
   var video = intro.querySelector('.intro-video');
   var tagline = intro.querySelector('.intro-tagline');
+  var videoCaption = document.getElementById('intro-video-caption');
   var gateLeft = intro.querySelector('.intro-gate-left');
   var gateRight = intro.querySelector('.intro-gate-right');
   var percentEl = document.getElementById('intro-percent');
   var finished = false;
+
+  // ②③のキャッチコピーを1文字ずつ<span>に分割し、transition-delayをずらして
+  // 「順番にゆっくり表示される」演出にする（本人指定・2026-09-08。文言は仮のため
+  // 後で差し替わっても、文字数に応じて滞在時間が自動で追従するようにしてある）。
+  function wrapCharsReveal(el, stepMs) {
+    var i = 0;
+    el.innerHTML = el.innerHTML.split('<br>').map(function(line){
+      return Array.from(line).map(function(ch){
+        var span = '<span class="char" style="transition-delay:' + (i * stepMs) + 'ms">' + ch + '</span>';
+        i++;
+        return span;
+      }).join('');
+    }).join('<br>');
+    return i;
+  }
+  var CHAR_STEP = 60;    // 1文字あたりの表示間隔(ms)
+  var CHAR_FADE = 550;   // 1文字のフェード時間(ms)。CSSの.char transitionと合わせる
+  var READ_BUFFER = 2500; // 全文字が表示され終わってから、読む余裕として追加する時間(ms)
+  var taglineCharCount = wrapCharsReveal(tagline, CHAR_STEP);
+  var videoCaptionCharCount = wrapCharsReveal(videoCaption, CHAR_STEP);
+  var taglineHoldMs = Math.max(5000, (taglineCharCount - 1) * CHAR_STEP + CHAR_FADE + READ_BUFFER);
+  var videoHoldMs = Math.max(3000, (videoCaptionCharCount - 1) * CHAR_STEP + CHAR_FADE + READ_BUFFER);
 
   var RING_MS = 1400;
   var start = performance.now();
@@ -396,7 +427,6 @@
     tagline.classList.add('intro-tagline-show');
     document.getElementById('intro-shrine-name').classList.add('intro-shrine-name-show');
   }
-  var videoCaption = document.getElementById('intro-video-caption');
   function showVideo() {
     hero.classList.add('intro-hero-fade');
     video.classList.add('intro-video-show');
@@ -404,11 +434,11 @@
     videoCaption.classList.add('intro-video-caption-show');
   }
   intro.addEventListener('click', finish);
-  setTimeout(openGates, 1500);        // ①ロード(1.4s)完了→gateが開く
-  setTimeout(showVideo, 1500 + 5000); // ②鳥居の静止画を約5秒見せる→③動画へ
+  setTimeout(openGates, 1500);                    // ①ロード(1.4s)完了→gateが開く
+  setTimeout(showVideo, 1500 + taglineHoldMs);     // ②鳥居の静止画＋文字が読み終わるまで見せる→③動画へ
   // ③→④：自動送り版と違い、ここでは動画の後すぐ#introを閉じてスクロール領域へ渡す
   // （タイマーで写真を送るのではなく、本人が実際にスクロールして3枚を見る方式のため）
-  setTimeout(finish, 1500 + 5000 + 3000); // ③動画を約3秒見せる→④（スクロール領域）へ
+  setTimeout(finish, 1500 + taglineHoldMs + videoHoldMs); // ③動画＋文字が読み終わるまで見せる→④（スクロール領域）へ
 })();
 
 // ④の固定キャプションは、本体（mock-app）に入ったら消す
