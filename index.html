@@ -240,6 +240,15 @@
     font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
     font-size: 18px; color: var(--gold); margin: 0; letter-spacing: 0.04em;
   }
+  /* 言語切替（本人指摘・2026-09-08：漢字1文字のタグは海外版では意味をなさない。
+     タグ・神社名の表現を英語に切り替えて見比べられるようにする試作） */
+  .lang-toggle { display: flex; gap: 4px; margin-left: auto; flex-shrink: 0; }
+  .lang-btn {
+    font-size: 11px; letter-spacing: 0.05em; padding: 5px 10px; border-radius: 14px;
+    border: 1px solid var(--border-4); background: transparent; color: var(--tan-text);
+    cursor: pointer; font-family: inherit;
+  }
+  .lang-btn.active { background: rgba(var(--gold-glow-rgb),0.22); border-color: var(--gold); color: var(--gold); }
   /* 個別神社ページへの導線（本人指定・2026-09-08：本番地図の上部アイコン列と
      同じ考え方で、地図の下に別枠を作らず地図の上に置く。地図はflex:1で
      残りの縦幅をすべて使い、以前のように地図が窮屈にならないようにする） */
@@ -350,7 +359,11 @@
 <div class="mock-app" id="mock-app">
   <div class="mock-header">
     <div class="torii-icon">⛩</div>
-    <h1>社巡り道標（海外版・仮）</h1>
+    <h1 id="mock-title">社巡り道標（海外版・仮）</h1>
+    <div class="lang-toggle" id="lang-toggle">
+      <button type="button" class="lang-btn active" data-lang="ja">日本語</button>
+      <button type="button" class="lang-btn" data-lang="en">EN</button>
+    </div>
   </div>
   <div class="shrine-select" id="shrine-select"></div>
   <div id="shrine-map"></div>
@@ -487,37 +500,50 @@
 
 // ⑤本体：神宮・大社タグの神社のみ（48社）を表示する簡易地図
 // マーカー・アイコン・ポップアップは本番index.htmlの実装をそのまま移植（フィルタ・サイドバー・参拝記録は含まない）
+// 言語切替（本人指摘・2026-09-08）：「漢字1文字のタグ・神社名バッジは海外版では
+// 意味をなさない」との指摘を受け、タグ・神社名・UI文言（チップ・見出し）を
+// 英語に切り替えて見比べられる試作を追加。個別社データ（由緒・祭神など、
+// shrines-jingu-taisha.jsonの中身）は翻訳コストが別次元のため対象外（日本語のまま）。
 (function(){
+  var currentLang = 'ja';
+  var HEADER_TITLE = { ja: '社巡り道標（海外版・仮）', en: 'Shrine Guide (Overseas Ver. — Draft)' };
+  var CHROME_TEXT = {
+    ja: { province: '旧国：', deity: '祭神：', map: '地図', official: '公式', wiki: 'Wiki' },
+    en: { province: 'Province: ', deity: 'Deity: ', map: 'Map', official: 'Official', wiki: 'Wiki' },
+  };
   var PRIORITY = { jingu:10, taisha:9, ichi:8, ni:7, meisha:6, meisha2:5, hachiman:4, inari:3, meisha3:2 };
   var TAG_CONFIG = {
-    jingu:   { label:"神宮", char:"神", color:"#c47a08", border:"#f5c842" },
-    taisha:  { label:"大社", char:"大", color:"#6d28d9", border:"#c4a8ff" },
-    ichi:    { label:"一宮", char:"一", color:"#c41810", border:"#ff9a8a" },
-    ni:      { label:"二宮", char:"二", color:"#1540c0", border:"#88b4ff" },
-    meisha:  { label:"名社１", char:"名", color:"#047857", border:"#6ee7b7" },
-    meisha2: { label:"名社２", char:"社", color:"#0369a1", border:"#7dd3fc" },
-    meisha3: { label:"名社３", char:"奉", color:"#92400e", border:"#fcd34d" },
-    hachiman:{ label:"八幡", char:"八", color:"#be185d", border:"#f9a8d4" },
-    inari:   { label:"稲荷", char:"稲", color:"#0d9488", border:"#5eead4" },
+    jingu:   { label:{ja:'神宮',en:'Jingu'},        char:{ja:'神',en:'J'},  color:'#c47a08', border:'#f5c842' },
+    taisha:  { label:{ja:'大社',en:'Taisha'},       char:{ja:'大',en:'T'},  color:'#6d28d9', border:'#c4a8ff' },
+    ichi:    { label:{ja:'一宮',en:'Ichinomiya'},   char:{ja:'一',en:'I'},  color:'#c41810', border:'#ff9a8a' },
+    ni:      { label:{ja:'二宮',en:'Ninomiya'},     char:{ja:'二',en:'N'},  color:'#1540c0', border:'#88b4ff' },
+    meisha:  { label:{ja:'名社１',en:'Notable I'},   char:{ja:'名',en:'M1'}, color:'#047857', border:'#6ee7b7' },
+    meisha2: { label:{ja:'名社２',en:'Notable II'},  char:{ja:'社',en:'M2'}, color:'#0369a1', border:'#7dd3fc' },
+    meisha3: { label:{ja:'名社３',en:'Notable III'}, char:{ja:'奉',en:'M3'}, color:'#92400e', border:'#fcd34d' },
+    hachiman:{ label:{ja:'八幡',en:'Hachiman'},     char:{ja:'八',en:'H'},  color:'#be185d', border:'#f9a8d4' },
+    inari:   { label:{ja:'稲荷',en:'Inari'},        char:{ja:'稲',en:'In'}, color:'#0d9488', border:'#5eead4' },
   };
   function topTag(tags) {
     return tags.reduce(function(b,t){ return PRIORITY[t] > PRIORITY[b] ? t : b; }, tags[0]);
   }
   var iconCache = {};
   function getIcon(tag) {
-    if (iconCache[tag]) return iconCache[tag];
+    var key = currentLang + '_' + tag;
+    if (iconCache[key]) return iconCache[key];
     var c = TAG_CONFIG[tag];
+    var ch = c.char[currentLang];
     var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="34" height="42" viewBox="0 0 34 42">' +
       '<path d="M17 2C9 2 2 9 2 17c0 10 15 23 15 23S32 27 32 17C32 9 25 2 17 2z" fill="' + c.color + '" fill-opacity="0.9" stroke="' + c.border + '" stroke-width="1.5"/>' +
       '<circle cx="17" cy="17" r="9" fill="rgba(255,255,255,0.13)"/>' +
-      '<text x="17" y="22" text-anchor="middle" font-family="\'Hiragino Mincho ProN\',\'Yu Mincho\',serif" font-size="12" font-weight="bold" fill="white">' + c.char + '</text>' +
+      '<text x="17" y="22" text-anchor="middle" font-family="\'Hiragino Mincho ProN\',\'Yu Mincho\',serif" font-size="' + (ch.length > 1 ? 10 : 12) + '" font-weight="bold" fill="white">' + ch + '</text>' +
       '</svg>';
-    iconCache[tag] = L.divIcon({ html: svg, className: '', iconSize: [34,42], iconAnchor: [17,40], popupAnchor: [0,-42] });
-    return iconCache[tag];
+    iconCache[key] = L.divIcon({ html: svg, className: '', iconSize: [34,42], iconAnchor: [17,40], popupAnchor: [0,-42] });
+    return iconCache[key];
   }
   function buildPopupContent(s) {
+    var t = CHROME_TEXT[currentLang];
     var badges = s.tags.slice().sort(function(a,b){ return PRIORITY[b]-PRIORITY[a]; })
-      .map(function(t){ return '<span class="popup-badge ' + t + '">' + TAG_CONFIG[t].label + '</span>'; }).join('');
+      .map(function(tag){ return '<span class="popup-badge ' + tag + '">' + TAG_CONFIG[tag].label[currentLang] + '</span>'; }).join('');
     var reasonHtml = s.reason ? '<div class="popup-reason">' + s.reason + '</div>' : '';
     var gmapsUrl = 'https://www.google.com/maps/search/' + encodeURIComponent(s.name);
     var officialUrl = 'https://www.google.com/search?q=' + encodeURIComponent(s.name + ' 公式');
@@ -526,35 +552,57 @@
       '<div class="popup-badges">' + badges + '</div>' +
       '<div class="popup-name">' + s.name + '</div>' +
       '<div class="popup-pref">' + s.pref + '</div>' +
-      '<div class="popup-province">旧国：' + s.province + '</div>' +
+      '<div class="popup-province">' + t.province + s.province + '</div>' +
       reasonHtml +
-      '<div class="popup-deity">祭神：' + s.deity + '</div>' +
+      '<div class="popup-deity">' + t.deity + s.deity + '</div>' +
       '<div class="popup-links">' +
-        '<a href="' + gmapsUrl + '" target="_blank" rel="noopener" class="popup-link gmaps"><span class="popup-link-icon">📍</span>地図</a>' +
-        '<a href="' + officialUrl + '" target="_blank" rel="noopener" class="popup-link official"><span class="popup-link-icon">🌐</span>公式</a>' +
-        '<a href="' + wikiUrl + '" target="_blank" rel="noopener" class="popup-link wiki"><span class="popup-link-icon">📖</span>Wiki</a>' +
+        '<a href="' + gmapsUrl + '" target="_blank" rel="noopener" class="popup-link gmaps"><span class="popup-link-icon">📍</span>' + t.map + '</a>' +
+        '<a href="' + officialUrl + '" target="_blank" rel="noopener" class="popup-link official"><span class="popup-link-icon">🌐</span>' + t.official + '</a>' +
+        '<a href="' + wikiUrl + '" target="_blank" rel="noopener" class="popup-link wiki"><span class="popup-link-icon">📖</span>' + t.wiki + '</a>' +
       '</div></div>';
   }
 
   // 個別神社ページへの導線（本人指定・2026-09-08）：本番地図の上部アイコン列と
-  // 同じ「色付き丸バッジ＋漢字1文字」の見た目を流用。地図の下に別枠を作らず、
+  // 同じ「色付き丸バッジ＋1〜2文字」の見た目を流用。地図の下に別枠を作らず、
   // 地図の上に置くことで地図の表示領域を圧迫しない。ページが増えたら
   // この配列に追記するだけでよい。
   var SHRINE_PAGES = [
-    { name: '伊勢神宮', short: '伊', tag: 'jingu', file: 'shrine-pages/伊勢神宮.html' },
-    { name: '明治神宮', short: '明', tag: 'jingu', file: 'shrine-pages/明治神宮.html' },
+    { name:{ja:'伊勢神宮',en:'Ise Jingu'},   short:{ja:'伊',en:'I'}, tag:'jingu', file:'shrine-pages/伊勢神宮.html' },
+    { name:{ja:'明治神宮',en:'Meiji Jingu'}, short:{ja:'明',en:'M'}, tag:'jingu', file:'shrine-pages/明治神宮.html' },
   ];
-  (function renderShrineSelect(){
+  function renderShrineSelect(){
     var container = document.getElementById('shrine-select');
     if (!container) return;
     container.innerHTML = SHRINE_PAGES.map(function(s){
       var c = TAG_CONFIG[s.tag];
       return '<a class="shrine-select-item" href="' + s.file + '">' +
-        '<span class="shrine-select-badge" style="background:' + c.color + ';border:1.5px solid ' + c.border + ';">' + s.short + '</span>' +
-        '<span class="shrine-select-label">' + s.name + '</span>' +
+        '<span class="shrine-select-badge" style="background:' + c.color + ';border:1.5px solid ' + c.border + ';">' + s.short[currentLang] + '</span>' +
+        '<span class="shrine-select-label">' + s.name[currentLang] + '</span>' +
         '</a>';
     }).join('');
-  })();
+  }
+  renderShrineSelect();
+
+  var markerList = [];
+  function applyLang(lang) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+    });
+    document.getElementById('mock-title').textContent = HEADER_TITLE[lang];
+    renderShrineSelect();
+    markerList.forEach(function(item){
+      item.marker.setIcon(getIcon(topTag(item.shrine.tags)));
+      if (item.marker.getPopup()) item.marker.getPopup().setContent(buildPopupContent(item.shrine));
+    });
+  }
+  var langToggle = document.getElementById('lang-toggle');
+  if (langToggle) {
+    langToggle.addEventListener('click', function(e){
+      var btn = e.target.closest('.lang-btn');
+      if (btn) applyLang(btn.getAttribute('data-lang'));
+    });
+  }
 
   fetch('assets/shrines-jingu-taisha.json')
     .then(function(res){ return res.json(); })
@@ -584,9 +632,10 @@
       }).addTo(map);
       var bounds = [];
       shrines.forEach(function(s){
-        L.marker([s.lat, s.lng], { icon: getIcon(topTag(s.tags)) })
+        var marker = L.marker([s.lat, s.lng], { icon: getIcon(topTag(s.tags)) })
           .bindPopup(buildPopupContent(s), { className: 'shrine-popup' })
           .addTo(map);
+        markerList.push({ marker: marker, shrine: s });
         bounds.push([s.lat, s.lng]);
       });
       function fitWhenReady(attempts) {
