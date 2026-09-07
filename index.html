@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>神社マップ 日本版プレビュー（仮）</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
   /* ══════════════════════════════════════════════════════════════
      神社マップ_preview/index.html
@@ -16,9 +17,32 @@
     --bg-body: #1a1209;
     --bg-header-1: #2c1810;
     --gold: #f5d08a;
+    --gold-2: #e0b060;
     --gold-glow-rgb: 245,180,60;
+    --gold-muted: #907040;
     --border-4: #6a5030;
     --tan-text: #ddd0a0;
+    --tan-text-2: #b08858;
+    /* ── 以下、本番index.htmlのポップアップ配色をそのまま流用（⑤本体の神宮・大社地図用） ── */
+    --bg-popup-1: #1e0e06;
+    --bg-popup-2: #0f0a1a;
+    --border-header: #6b3a1f;
+    --text-body: #f0e6c8;
+    --color-link: #7eb8ff;
+    --color-link-hover: #aad4ff;
+    --color-wiki: #b8b8c8;
+    --color-wiki-hover: #d8d8e8;
+    --color-popup-reason: #708870;
+    --color-popup-deity: #906848;
+    --tag-jingu: #d4860a;    --tag-jingu-rgb: 212,134,10;   --tag-jingu-light: #f5c842;
+    --tag-taisha: #7c3aed;   --tag-taisha-rgb: 124,58,237;  --tag-taisha-light: #c4a8ff;
+    --tag-ichi: #e83020;     --tag-ichi-rgb: 232,48,32;     --tag-ichi-light: #ff9a8a;
+    --tag-ni: #1a50d8;       --tag-ni-rgb: 26,80,216;       --tag-ni-light: #88b4ff;
+    --tag-meisha: #059669;   --tag-meisha-rgb: 5,150,105;   --tag-meisha-light: #6ee7b7;
+    --tag-meisha2: #0284c7;  --tag-meisha2-rgb: 2,132,199;  --tag-meisha2-light: #7dd3fc;
+    --tag-meisha3: #b45309;  --tag-meisha3-rgb: 180,83,9;   --tag-meisha3-light: #fcd34d;
+    --tag-hachiman: #be185d; --tag-hachiman-rgb: 190,24,93; --tag-hachiman-light: #f9a8d4;
+    --tag-inari: #0d9488;    --tag-inari-rgb: 13,148,136;   --tag-inari-light: #5eead4;
   }
   * { box-sizing: border-box; }
   html { scroll-snap-type: y proximity; }
@@ -178,7 +202,7 @@
   }
   .scroll-slide:last-of-type .scroll-slide-hint { display: none; }
 
-  /* ── ここから下は「本体（地図・メニュー画面）」のプレースホルダー ── */
+  /* ── ここから下は「本体（地図・メニュー画面）」。地図本体は本番index.htmlの実装を流用 ── */
   .mock-app { min-height: 100vh; display: flex; flex-direction: column; scroll-snap-align: start; }
   .mock-header {
     padding: 16px 20px; border-bottom: 1px solid var(--border-4);
@@ -189,8 +213,46 @@
     font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
     font-size: 18px; color: var(--gold); margin: 0; letter-spacing: 0.04em;
   }
-  .mock-body { flex: 1; display: grid; place-items: center; padding: 40px; text-align: center; }
-  .mock-body p { max-width: 420px; line-height: 1.8; opacity: 0.7; font-size: 13px; }
+  #shrine-map { height: 70vh; min-height: 420px; width: 100%; }
+  /* タイルのみ暗色反転（マーカー・ポップアップには影響しない。本番index.htmlと同一処理） */
+  .leaflet-tile-pane {
+    filter: invert(0.91) hue-rotate(180deg) contrast(0.80) brightness(0.88) saturate(0.60);
+  }
+  .shrine-popup .leaflet-popup-content-wrapper {
+    background: linear-gradient(135deg, var(--bg-popup-1) 0%, var(--bg-popup-2) 100%);
+    border: 1px solid var(--border-header); border-radius: 8px; color: var(--text-body);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.8), 0 0 15px rgba(200,80,20,0.12);
+  }
+  .shrine-popup .leaflet-popup-tip { background: var(--border-header); }
+  .shrine-popup .leaflet-popup-close-button { color: var(--gold-muted) !important; }
+  .popup-content { min-width: 190px; }
+  .popup-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+  .popup-badge { display:inline-block; padding:2px 9px; border-radius:10px; font-size:11px; letter-spacing:0.06em; border:1px solid; }
+  .popup-badge.jingu    { background:rgba(var(--tag-jingu-rgb),0.22);    border-color:var(--tag-jingu);    color:var(--tag-jingu-light); }
+  .popup-badge.taisha   { background:rgba(var(--tag-taisha-rgb),0.22);   border-color:var(--tag-taisha);   color:var(--tag-taisha-light); }
+  .popup-badge.ichi     { background:rgba(var(--tag-ichi-rgb),0.22);     border-color:var(--tag-ichi);     color:var(--tag-ichi-light); }
+  .popup-badge.ni       { background:rgba(var(--tag-ni-rgb),0.22);       border-color:var(--tag-ni);       color:var(--tag-ni-light); }
+  .popup-badge.meisha   { background:rgba(var(--tag-meisha-rgb),0.22);   border-color:var(--tag-meisha);   color:var(--tag-meisha-light); }
+  .popup-badge.meisha2  { background:rgba(var(--tag-meisha2-rgb),0.22);  border-color:var(--tag-meisha2);  color:var(--tag-meisha2-light); }
+  .popup-badge.meisha3  { background:rgba(var(--tag-meisha3-rgb),0.22);  border-color:var(--tag-meisha3);  color:var(--tag-meisha3-light); }
+  .popup-badge.hachiman { background:rgba(var(--tag-hachiman-rgb),0.22); border-color:var(--tag-hachiman); color:var(--tag-hachiman-light); }
+  .popup-badge.inari    { background:rgba(var(--tag-inari-rgb),0.22);    border-color:var(--tag-inari);    color:var(--tag-inari-light); }
+  .popup-name { font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif; font-size:16px; font-weight:bold; color:var(--gold); margin-bottom:3px; text-shadow:0 0 8px rgba(var(--gold-glow-rgb),0.3); }
+  .popup-pref { font-size:11px; color:var(--gold-muted); margin-bottom:7px; }
+  .popup-province { font-size:11px; color:var(--tan-text-2); padding:3px 8px; background:rgba(255,255,255,0.05); border-radius:4px; margin-bottom:5px; }
+  .popup-reason { font-size:11px; color:var(--color-popup-reason); padding:3px 8px; background:rgba(0,255,128,0.04); border-radius:4px; margin-bottom:5px; }
+  .popup-deity { font-size:11px; color:var(--color-popup-deity); line-height:1.6; margin-bottom:8px; }
+  .popup-links { display: flex; gap: 5px; margin-top: 6px; }
+  .popup-link { display: flex; align-items: center; justify-content: center; gap: 4px; flex: 1; min-width: 0; padding: 5px 6px; border-radius: 6px; font-size: 10.5px; text-decoration: none; letter-spacing: 0.03em; white-space: nowrap; }
+  .popup-link-icon { font-size: 12px; }
+  .popup-link.gmaps { background: rgba(66,133,244,0.14); border: 1px solid rgba(66,133,244,0.35); color: var(--color-link); }
+  .popup-link.gmaps:hover { background: rgba(66,133,244,0.28); color: var(--color-link-hover); }
+  .popup-link.official { background: rgba(var(--tag-jingu-rgb),0.14); border: 1px solid rgba(var(--tag-jingu-rgb),0.35); color: var(--gold-2); }
+  .popup-link.official:hover { background: rgba(var(--tag-jingu-rgb),0.28); color: var(--gold); }
+  .popup-link.wiki { background: rgba(150,150,165,0.14); border: 1px solid rgba(150,150,165,0.35); color: var(--color-wiki); }
+  .popup-link.wiki:hover { background: rgba(150,150,165,0.28); color: var(--color-wiki-hover); }
+  .mock-body { padding: 24px 40px 40px; text-align: center; }
+  .mock-body p { max-width: 420px; margin: 0 auto; line-height: 1.8; opacity: 0.7; font-size: 13px; }
 
   #replay-btn {
     position: fixed; right: 14px; bottom: 14px; z-index: 4000;
@@ -250,10 +312,9 @@
     <div class="torii-icon">⛩</div>
     <h1>社巡り道標（海外版・仮）</h1>
   </div>
+  <div id="shrine-map"></div>
   <div class="mock-body">
-    <p>ここに本体画面（地図・フィルタ・神社リスト）が入る。<br>
-    このファイルはオープニング演出だけを検証するプロトタイプなので、
-    本体側は仮のプレースホルダー。<br><br>
+    <p>神宮・大社タグの48社のみを表示（本体はまだ地図のみ、フィルタ・神社リストは未実装のプロトタイプ）。<br><br>
     個別ページのサンプル：<br>
     <a href="shrine-pages/伊勢神宮.html" style="color:var(--gold);">伊勢神宮</a>
     <a href="shrine-pages/明治神宮.html" style="color:var(--gold);">明治神宮</a></p>
@@ -262,6 +323,7 @@
 
 <button id="replay-btn" onclick="sessionStorage.removeItem('introShown'); location.reload();">🔄 演出をやり直す</button>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (function(){
   // ②鳥居の静止画＋神社名（自動送り版と同一の仕組み）
@@ -361,6 +423,85 @@
     });
   }, { threshold: 0.4 });
   items.forEach(function(el){ io.observe(el); });
+})();
+
+// ⑤本体：神宮・大社タグの神社のみ（48社）を表示する簡易地図
+// マーカー・アイコン・ポップアップは本番index.htmlの実装をそのまま移植（フィルタ・サイドバー・参拝記録は含まない）
+(function(){
+  var PRIORITY = { jingu:10, taisha:9, ichi:8, ni:7, meisha:6, meisha2:5, hachiman:4, inari:3, meisha3:2 };
+  var TAG_CONFIG = {
+    jingu:   { label:"神宮", char:"神", color:"#c47a08", border:"#f5c842" },
+    taisha:  { label:"大社", char:"大", color:"#6d28d9", border:"#c4a8ff" },
+    ichi:    { label:"一宮", char:"一", color:"#c41810", border:"#ff9a8a" },
+    ni:      { label:"二宮", char:"二", color:"#1540c0", border:"#88b4ff" },
+    meisha:  { label:"名社１", char:"名", color:"#047857", border:"#6ee7b7" },
+    meisha2: { label:"名社２", char:"社", color:"#0369a1", border:"#7dd3fc" },
+    meisha3: { label:"名社３", char:"奉", color:"#92400e", border:"#fcd34d" },
+    hachiman:{ label:"八幡", char:"八", color:"#be185d", border:"#f9a8d4" },
+    inari:   { label:"稲荷", char:"稲", color:"#0d9488", border:"#5eead4" },
+  };
+  function topTag(tags) {
+    return tags.reduce(function(b,t){ return PRIORITY[t] > PRIORITY[b] ? t : b; }, tags[0]);
+  }
+  var iconCache = {};
+  function getIcon(tag) {
+    if (iconCache[tag]) return iconCache[tag];
+    var c = TAG_CONFIG[tag];
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="34" height="42" viewBox="0 0 34 42">' +
+      '<path d="M17 2C9 2 2 9 2 17c0 10 15 23 15 23S32 27 32 17C32 9 25 2 17 2z" fill="' + c.color + '" fill-opacity="0.9" stroke="' + c.border + '" stroke-width="1.5"/>' +
+      '<circle cx="17" cy="17" r="9" fill="rgba(255,255,255,0.13)"/>' +
+      '<text x="17" y="22" text-anchor="middle" font-family="\'Hiragino Mincho ProN\',\'Yu Mincho\',serif" font-size="12" font-weight="bold" fill="white">' + c.char + '</text>' +
+      '</svg>';
+    iconCache[tag] = L.divIcon({ html: svg, className: '', iconSize: [34,42], iconAnchor: [17,40], popupAnchor: [0,-42] });
+    return iconCache[tag];
+  }
+  function buildPopupContent(s) {
+    var badges = s.tags.slice().sort(function(a,b){ return PRIORITY[b]-PRIORITY[a]; })
+      .map(function(t){ return '<span class="popup-badge ' + t + '">' + TAG_CONFIG[t].label + '</span>'; }).join('');
+    var reasonHtml = s.reason ? '<div class="popup-reason">' + s.reason + '</div>' : '';
+    var gmapsUrl = 'https://www.google.com/maps/search/' + encodeURIComponent(s.name);
+    var officialUrl = 'https://www.google.com/search?q=' + encodeURIComponent(s.name + ' 公式');
+    var wikiUrl = 'https://ja.wikipedia.org/w/index.php?search=' + encodeURIComponent(s.name) + '&title=特別:検索&go=Go';
+    return '<div class="popup-content">' +
+      '<div class="popup-badges">' + badges + '</div>' +
+      '<div class="popup-name">' + s.name + '</div>' +
+      '<div class="popup-pref">' + s.pref + '</div>' +
+      '<div class="popup-province">旧国：' + s.province + '</div>' +
+      reasonHtml +
+      '<div class="popup-deity">祭神：' + s.deity + '</div>' +
+      '<div class="popup-links">' +
+        '<a href="' + gmapsUrl + '" target="_blank" rel="noopener" class="popup-link gmaps"><span class="popup-link-icon">📍</span>地図</a>' +
+        '<a href="' + officialUrl + '" target="_blank" rel="noopener" class="popup-link official"><span class="popup-link-icon">🌐</span>公式</a>' +
+        '<a href="' + wikiUrl + '" target="_blank" rel="noopener" class="popup-link wiki"><span class="popup-link-icon">📖</span>Wiki</a>' +
+      '</div></div>';
+  }
+  fetch('assets/shrines-jingu-taisha.json')
+    .then(function(res){ return res.json(); })
+    .then(function(shrines){
+      var map = L.map('shrine-map', { center: [36.0,136.5], zoom: 5 });
+      L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', {
+        attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">地理院タイル</a>',
+        maxZoom: 18
+      }).addTo(map);
+      var bounds = [];
+      shrines.forEach(function(s){
+        L.marker([s.lat, s.lng], { icon: getIcon(topTag(s.tags)) })
+          .bindPopup(buildPopupContent(s), { className: 'shrine-popup' })
+          .addTo(map);
+        bounds.push([s.lat, s.lng]);
+      });
+      function fitWhenReady(attempts) {
+        attempts = attempts || 0;
+        map.invalidateSize();
+        var size = map.getSize();
+        if ((size.x > 0 && size.y > 0) || attempts >= 30) {
+          map.fitBounds(bounds, { padding: [30,30] });
+        } else {
+          requestAnimationFrame(function(){ fitWhenReady(attempts + 1); });
+        }
+      }
+      fitWhenReady();
+    });
 })();
 </script>
 </body>
