@@ -196,19 +196,27 @@
   }
   .fixed-caption.fixed-caption-show { opacity: 1; }
   .scroll-slide-hint {
-    position: absolute; left: 50%; bottom: 32px; transform: translateX(-50%);
-    display: flex; flex-direction: column; align-items: center; gap: 2px;
-    font-size: 11px; letter-spacing: 0.2em; color: rgba(245,208,138,0.85);
+    position: absolute; left: 50%; bottom: 44px; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 12px 26px; border-radius: 32px;
+    background: rgba(0,0,0,0.4); border: 1px solid rgba(var(--gold-glow-rgb),0.45);
+    font-size: 14px; font-weight: 700; letter-spacing: 0.35em; color: var(--gold);
     text-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    animation: scrollHintPulse 1.6s ease-in-out infinite;
   }
   .scroll-slide-hint-arrow {
-    font-size: 20px; line-height: 1; animation: scrollHintBounce 1.6s ease-in-out infinite;
+    font-size: 32px; line-height: 1; animation: scrollHintBounce 1.4s ease-in-out infinite;
   }
   @keyframes scrollHintBounce {
-    0%, 100% { transform: translateY(0); opacity: 0.55; }
-    50% { transform: translateY(7px); opacity: 1; }
+    0%, 100% { transform: translateY(0); opacity: 0.65; }
+    50% { transform: translateY(14px); opacity: 1; }
+  }
+  @keyframes scrollHintPulse {
+    0%, 100% { box-shadow: 0 0 14px rgba(var(--gold-glow-rgb),0.2); }
+    50% { box-shadow: 0 0 34px rgba(var(--gold-glow-rgb),0.5); }
   }
   @media (prefers-reduced-motion: reduce) {
+    .scroll-slide-hint { animation: none; }
     .scroll-slide-hint-arrow { animation: none; }
   }
 
@@ -488,10 +496,25 @@
   fetch('assets/shrines-jingu-taisha.json')
     .then(function(res){ return res.json(); })
     .then(function(shrines){
-      // scrollWheelZoom:false — ページをスクロールして地図の上を通過する際に
-      // 誤ってズームアウトしてしまうのを防ぐ（本人指摘・2026-09-08）。
-      // ズーム操作は左上の+/-ボタンとダブルクリック・ピンチ操作で行う。
+      // scrollWheelZoom:false で開始し、ページスクロールで地図の上を通過した
+      // 最初の一撃だけ誤ズームを防ぐ。ただしその後は地図をスクロール操作で
+      // 触りたいという本人要望があるため、地図上でのスクロールがいったん
+      // 止まった時点（＝勢いで通過し終えたと判断できる時点）で自動的に
+      // scrollWheelZoomを有効化する（本人指摘・2026-09-08）。
       var map = L.map('shrine-map', { center: [36.0,136.5], zoom: 5, scrollWheelZoom: false });
+      (function(){
+        var mapEl = document.getElementById('shrine-map');
+        var armTimer = null;
+        function arm() {
+          map.scrollWheelZoom.enable();
+          mapEl.removeEventListener('wheel', onWheel);
+        }
+        function onWheel() {
+          clearTimeout(armTimer);
+          armTimer = setTimeout(arm, 500);
+        }
+        mapEl.addEventListener('wheel', onWheel, { passive: true });
+      })();
       L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', {
         attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">地理院タイル</a>',
         maxZoom: 18
