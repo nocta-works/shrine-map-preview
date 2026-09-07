@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>伊勢神宮｜神社マップ 日本版プレビュー（仮）</title>
+<style>
+  /* ══════════════════════════════════════════════════════════════
+     design-lab/shrine-pages/伊勢神宮.html
+     位置づけ：「超有名どころ特集」＝個別の神社紹介ページのサンプル。
+     本番から完全分離、海外版（枝1）の基礎デザインとして育てる想定。
+     写真素材は写真動画/伊勢神宮/ の原本を design-lab/assets/ に軽量化して使用。
+     ══════════════════════════════════════════════════════════════ */
+  :root {
+    --bg-body: #1a1209;
+    --bg-header-1: #2c1810;
+    --gold: #f5d08a;
+    --gold-glow-rgb: 245,180,60;
+    --gold-muted: #907040;
+    --border-4: #6a5030;
+    --tan-text: #ddd0a0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg-body); color: var(--tan-text);
+    font-family: -apple-system, 'Hiragino Kaku Gothic ProN', sans-serif;
+    line-height: 1.6;
+  }
+  a { color: var(--gold); }
+
+  .back-link {
+    position: fixed; top: 16px; left: 16px; z-index: 10;
+    font-size: 12px; color: var(--tan-text); text-decoration: none;
+    background: rgba(0,0,0,0.4); padding: 6px 12px; border-radius: 20px;
+    border: 1px solid var(--border-4);
+  }
+
+  /* ── ヒーロー：写真＋神社名 ── */
+  .shrine-hero {
+    position: relative; height: 78vh; min-height: 460px;
+    display: flex; align-items: flex-end;
+  }
+  .shrine-hero img {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    filter: saturate(0.92) contrast(1.05);
+  }
+  .shrine-hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0.1) 55%, rgba(0,0,0,0.25));
+  }
+  .shrine-hero-content { position: relative; padding: 0 var(--pad-x, 6vw) 48px; width: 100%; }
+  .shrine-badge {
+    display: inline-block; font-size: 11px; letter-spacing: 0.15em; color: var(--gold);
+    border: 1px solid rgba(var(--gold-glow-rgb),0.5); border-radius: 20px; padding: 4px 14px;
+    margin-bottom: 16px; text-transform: uppercase;
+  }
+  .shrine-name-en { display: block; font-size: 13px; letter-spacing: 0.2em; color: var(--gold-muted); margin-bottom: 6px; text-transform: uppercase; }
+  .shrine-name-ja {
+    font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+    font-size: clamp(32px, 6vw, 56px); color: var(--gold); margin: 0; letter-spacing: 0.04em;
+    text-shadow: 0 4px 24px rgba(0,0,0,0.6);
+  }
+  .shrine-meta { display: flex; gap: 24px; margin-top: 18px; flex-wrap: wrap; font-size: 12px; color: var(--tan-text); opacity: 0.85; }
+  .shrine-meta span b { color: var(--gold); font-weight: normal; display: block; font-size: 10px; letter-spacing: 0.1em; opacity: 0.7; margin-bottom: 2px; }
+
+  /* ── 本文セクション ── */
+  .content { max-width: 760px; margin: 0 auto; padding: 70px var(--pad-x, 6vw); }
+  .section { margin-bottom: 64px; opacity: 0; transform: translateY(30px); transition: opacity 1.1s ease, transform 1.1s ease; }
+  .section.revealed { opacity: 1; transform: translateY(0); }
+  .section-label {
+    font-size: 11px; letter-spacing: 0.2em; color: var(--gold-muted);
+    text-transform: uppercase; display: block; margin-bottom: 10px;
+  }
+  .section-title {
+    font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+    font-size: 22px; color: var(--gold); margin: 0 0 18px; letter-spacing: 0.03em;
+  }
+  .section p { font-size: 14.5px; color: var(--tan-text); opacity: 0.92; margin: 0 0 12px; }
+
+  /* ── ギャラリー：メイン＋サムネイル ── */
+  .gallery { margin-bottom: 64px; opacity: 0; transform: translateY(30px); transition: opacity 1.1s ease, transform 1.1s ease; }
+  .gallery.revealed { opacity: 1; transform: translateY(0); }
+  .gallery-main { width: 100%; aspect-ratio: 3/2; overflow: hidden; border: 1px solid rgba(245,208,138,0.18); margin-bottom: 10px; }
+  .gallery-main img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(0.92) contrast(1.05); transition: opacity 0.3s ease; }
+  .gallery-thumbs { display: flex; gap: 8px; }
+  .gallery-thumbs button {
+    flex: 1; padding: 0; border: 2px solid transparent; border-radius: 2px; overflow: hidden;
+    aspect-ratio: 1/1; cursor: pointer; background: none; opacity: 0.55; transition: opacity 0.2s ease, border-color 0.2s ease;
+  }
+  .gallery-thumbs button img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .gallery-thumbs button.active { opacity: 1; border-color: var(--gold); }
+  .gallery-thumbs button:hover { opacity: 0.85; }
+
+  .page-footer { text-align: center; padding: 40px; font-size: 11px; color: var(--border-4); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .section, .gallery { opacity: 1 !important; transform: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<a href="../index.html" class="back-link">← トップに戻る</a>
+
+<div class="shrine-hero">
+  <img src="../assets/ise-hero.jpg" alt="伊勢神宮 鳥居">
+  <div class="shrine-hero-overlay"></div>
+  <div class="shrine-hero-content">
+    <span class="shrine-badge">神宮</span>
+    <span class="shrine-name-en">Ise Jingu</span>
+    <h1 class="shrine-name-ja">伊勢神宮</h1>
+    <div class="shrine-meta">
+      <span><b>御祭神</b>天照坐皇大御神（内宮）・豊受大御神（外宮）</span>
+      <span><b>所在地</b>三重県伊勢市</span>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="section">
+    <span class="section-label">History</span>
+    <h2 class="section-title">由緒・創建</h2>
+    <p>内宮（皇大神宮）は約2000年前、天照大御神が伊勢の地に鎮座されたと伝わる。外宮（豊受大神宮）は約1500年前、天照大御神の食事を司る豊受大御神を祀る。正式名称は「神宮」で、全国約8万社の神社の中心的な存在とされる。</p>
+    <p>20年に一度、社殿を新しく建て替え、神宝・装束まですべて新調する式年遷宮が飛鳥時代から続けられている。前回は2013年、次回は2033年の予定。</p>
+  </div>
+
+  <div class="section">
+    <span class="section-label">Highlights</span>
+    <h2 class="section-title">見どころ</h2>
+    <p>宇治橋を渡って五十鈴川のほとりへ。神明造の社殿は釘を一切使わない古代建築様式で、白木の美しさが式年遷宮のたびに保たれる。内宮の正宮のほか、別宮の荒祭宮・風日祈宮なども参拝の価値が高い。</p>
+  </div>
+
+  <div class="gallery">
+    <div class="gallery-main">
+      <img id="ise-gallery-main" src="../assets/ise-hero.jpg" alt="伊勢神宮">
+    </div>
+    <div class="gallery-thumbs">
+      <button class="active" data-src="../assets/ise-hero.jpg" onclick="switchGallery(this,'ise')"><img src="../assets/ise-hero.jpg" alt=""></button>
+      <button data-src="../assets/ise-approach.jpg" onclick="switchGallery(this,'ise')"><img src="../assets/ise-approach.jpg" alt=""></button>
+      <button data-src="../assets/ise-tree.jpg" onclick="switchGallery(this,'ise')"><img src="../assets/ise-tree.jpg" alt=""></button>
+      <button data-src="../assets/ise-river.jpg" onclick="switchGallery(this,'ise')"><img src="../assets/ise-river.jpg" alt=""></button>
+      <button data-src="../assets/ise-shrine2.jpg" onclick="switchGallery(this,'ise')"><img src="../assets/ise-shrine2.jpg" alt=""></button>
+    </div>
+  </div>
+
+  <div class="section">
+    <span class="section-label">Visiting Tips</span>
+    <h2 class="section-title">参拝のポイント</h2>
+    <p>伝統的な順序は外宮から内宮へ。早朝5時からの参拝は空気が澄み、参道の杉並木も一段と美しく見える。内宮・外宮それぞれで御朱印の授与所が異なるので両方立ち寄りたい。</p>
+  </div>
+
+  <div class="section">
+    <span class="section-label">Background</span>
+    <h2 class="section-title">文化的背景</h2>
+    <p>「神宮」という言葉は本来、伊勢神宮そのものを指す。式年遷宮は建物だけでなく神宝・装束まですべて新しく作り直す「常若（とこわか）」という思想に基づいており、老朽化対策ではなく常に清浄な状態を保つための制度。江戸時代には庶民が伊勢を目指す「おかげ参り」が一大ブームとなった。</p>
+  </div>
+
+</div>
+
+<div class="page-footer">個別神社紹介ページ プロトタイプ・伊勢神宮 / design-lab（本番未反映）</div>
+
+<script>
+function switchGallery(btn, prefix) {
+  var main = document.getElementById(prefix + '-gallery-main');
+  main.style.opacity = '0';
+  setTimeout(function(){
+    main.src = btn.getAttribute('data-src');
+    main.style.opacity = '1';
+  }, 150);
+  var group = btn.parentElement.querySelectorAll('button');
+  group.forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+(function(){
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var items = document.querySelectorAll('.section, .gallery');
+  if (reduced || !('IntersectionObserver' in window)) {
+    items.forEach(function(el){ el.classList.add('revealed'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting) { entry.target.classList.add('revealed'); io.unobserve(entry.target); }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+  items.forEach(function(el){ io.observe(el); });
+})();
+</script>
+</body>
+</html>
