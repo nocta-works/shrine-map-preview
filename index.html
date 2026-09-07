@@ -196,11 +196,21 @@
   }
   .fixed-caption.fixed-caption-show { opacity: 1; }
   .scroll-slide-hint {
-    position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%);
-    font-size: 11px; letter-spacing: 0.15em; color: rgba(221,208,160,0.6);
-    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    position: absolute; left: 50%; bottom: 32px; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    font-size: 11px; letter-spacing: 0.2em; color: rgba(245,208,138,0.85);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.7);
   }
-  .scroll-slide:last-of-type .scroll-slide-hint { display: none; }
+  .scroll-slide-hint-arrow {
+    font-size: 20px; line-height: 1; animation: scrollHintBounce 1.6s ease-in-out infinite;
+  }
+  @keyframes scrollHintBounce {
+    0%, 100% { transform: translateY(0); opacity: 0.55; }
+    50% { transform: translateY(7px); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-slide-hint-arrow { animation: none; }
+  }
 
   /* ── ここから下は「本体（地図・メニュー画面）」。地図本体は本番index.htmlの実装を流用 ── */
   .mock-app { min-height: 100vh; display: flex; flex-direction: column; scroll-snap-align: start; }
@@ -296,15 +306,15 @@
 
 <section class="scroll-slide reveal-slide">
   <img src="assets/katori-backlit.jpg" alt="香取神宮">
-  <div class="scroll-slide-hint">↓ scroll</div>
+  <div class="scroll-slide-hint"><span class="scroll-slide-hint-arrow">⌄</span>SCROLL</div>
 </section>
 <section class="scroll-slide reveal-slide">
   <img src="assets/kashima-hall.jpg" alt="鹿島神宮">
-  <div class="scroll-slide-hint">↓ scroll</div>
+  <div class="scroll-slide-hint"><span class="scroll-slide-hint-arrow">⌄</span>SCROLL</div>
 </section>
 <section class="scroll-slide reveal-slide" id="last-scroll-slide">
   <img src="assets/samukawa-sakura.jpg" alt="寒川神社">
-  <div class="scroll-slide-hint">↓ scroll</div>
+  <div class="scroll-slide-hint"><span class="scroll-slide-hint-arrow">⌄</span>SCROLL</div>
 </section>
 
 <div class="mock-app" id="mock-app">
@@ -478,7 +488,10 @@
   fetch('assets/shrines-jingu-taisha.json')
     .then(function(res){ return res.json(); })
     .then(function(shrines){
-      var map = L.map('shrine-map', { center: [36.0,136.5], zoom: 5 });
+      // scrollWheelZoom:false — ページをスクロールして地図の上を通過する際に
+      // 誤ってズームアウトしてしまうのを防ぐ（本人指摘・2026-09-08）。
+      // ズーム操作は左上の+/-ボタンとダブルクリック・ピンチ操作で行う。
+      var map = L.map('shrine-map', { center: [36.0,136.5], zoom: 5, scrollWheelZoom: false });
       L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', {
         attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">地理院タイル</a>',
         maxZoom: 18
