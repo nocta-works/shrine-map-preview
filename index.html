@@ -353,6 +353,25 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (function(){
+  // ②③のキャッチコピー・神社名を1文字ずつ<span>に分割し、transition-delayを
+  // ずらして「順番にゆっくり表示される」演出にする（本人指定・2026-09-08）。
+  // fetchのコールバックは reduced/alreadyShown の早期returnと無関係に実行される
+  // ため、CHAR_STEPはここで最初に定義しておく。
+  function wrapCharsReveal(el, stepMs) {
+    var i = 0;
+    el.innerHTML = el.innerHTML.split('<br>').map(function(line){
+      return Array.from(line).map(function(ch){
+        var span = '<span class="char" style="transition-delay:' + (i * stepMs) + 'ms">' + ch + '</span>';
+        i++;
+        return span;
+      }).join('');
+    }).join('<br>');
+    return i;
+  }
+  var CHAR_STEP = 120;   // 1文字あたりの表示間隔(ms)（本人指摘「速すぎる」で60→120に倍増）
+  var CHAR_FADE = 1100;  // 1文字のフェード時間(ms)。CSSの.char transitionと合わせる（同じく倍増）
+  var READ_BUFFER = 2500; // 全文字が表示され終わってから、読む余裕として追加する時間(ms)
+
   // ②鳥居の静止画＋神社名（自動送り版と同一の仕組み）
   var heroImg = document.querySelector('.intro-hero-media');
   var shrineNameEl = document.getElementById('intro-shrine-name');
@@ -383,23 +402,6 @@
   var percentEl = document.getElementById('intro-percent');
   var finished = false;
 
-  // ②③のキャッチコピーを1文字ずつ<span>に分割し、transition-delayをずらして
-  // 「順番にゆっくり表示される」演出にする（本人指定・2026-09-08。文言は仮のため
-  // 後で差し替わっても、文字数に応じて滞在時間が自動で追従するようにしてある）。
-  function wrapCharsReveal(el, stepMs) {
-    var i = 0;
-    el.innerHTML = el.innerHTML.split('<br>').map(function(line){
-      return Array.from(line).map(function(ch){
-        var span = '<span class="char" style="transition-delay:' + (i * stepMs) + 'ms">' + ch + '</span>';
-        i++;
-        return span;
-      }).join('');
-    }).join('<br>');
-    return i;
-  }
-  var CHAR_STEP = 120;   // 1文字あたりの表示間隔(ms)（本人指摘「速すぎる」で60→120に倍増）
-  var CHAR_FADE = 1100;  // 1文字のフェード時間(ms)。CSSの.char transitionと合わせる（同じく倍増）
-  var READ_BUFFER = 2500; // 全文字が表示され終わってから、読む余裕として追加する時間(ms)
   var taglineCharCount = wrapCharsReveal(tagline, CHAR_STEP);
   var videoCaptionCharCount = wrapCharsReveal(videoCaption, CHAR_STEP);
   var taglineHoldMs = Math.max(5000, (taglineCharCount - 1) * CHAR_STEP + CHAR_FADE + READ_BUFFER);
