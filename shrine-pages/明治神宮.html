@@ -85,24 +85,29 @@
   }
   .section p { font-size: 14.5px; color: var(--tan-text); opacity: 0.92; margin: 0 0 12px; }
 
-  .gallery { margin-bottom: 64px; opacity: 0; transform: translateY(30px); transition: opacity 1.1s ease, transform 1.1s ease; }
-  .gallery.revealed { opacity: 1; transform: translateY(0); }
-  .gallery-main { width: 100%; aspect-ratio: 3/2; overflow: hidden; border: 1px solid rgba(245,208,138,0.18); margin-bottom: 10px; }
-  .gallery-main img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(0.92) contrast(1.05); transition: opacity 0.3s ease, transform 0.6s ease; }
-  .gallery-main:hover img { transform: scale(1.04); }
-  .gallery-thumbs { display: flex; gap: 8px; }
-  .gallery-thumbs button {
-    flex: 1; padding: 0; border: 2px solid transparent; border-radius: 2px; overflow: hidden;
-    aspect-ratio: 1/1; cursor: pointer; background: none; opacity: 0.55; transition: opacity 0.2s ease, border-color 0.2s ease;
+  /* ── 全幅の差し込み写真（本人指定・2026-09-09：サムネイル選択式ギャラリーを
+     廃止し、National Geographicの記事のように本文の合間に1枚ずつ全幅で
+     写真を差し込むエディトリアル型に変更） ── */
+  .photo-block {
+    position: relative; left: 50%; right: 50%;
+    width: 100vw; margin-left: -50vw; margin-right: -50vw;
+    margin-bottom: 64px;
+    opacity: 0; transform: translateY(30px); transition: opacity 1.1s ease, transform 1.1s ease;
   }
-  .gallery-thumbs button img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .gallery-thumbs button.active { opacity: 1; border-color: var(--gold); }
-  .gallery-thumbs button:hover { opacity: 0.85; }
+  .photo-block.revealed { opacity: 1; transform: translateY(0); }
+  .photo-block img {
+    display: block; width: 100%; height: 62vh; min-height: 340px; object-fit: cover;
+    filter: saturate(0.92) contrast(1.05);
+  }
+  .photo-block-caption {
+    max-width: 620px; margin: 16px auto 0; padding: 0 6vw;
+    font-size: 12.5px; color: var(--gold-muted); text-align: center; line-height: 1.7; letter-spacing: 0.02em;
+  }
 
   .page-footer { text-align: center; padding: 40px; font-size: 11px; color: var(--border-4); }
 
   @media (prefers-reduced-motion: reduce) {
-    .section, .gallery { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .section, .photo-block { opacity: 1 !important; transform: none !important; transition: none !important; }
   }
 </style>
 </head>
@@ -138,22 +143,20 @@
     <p>現在は自然林とほとんど見分けがつかないほどに生育し、「代々木の杜」と呼ばれる都市林の代表例になっている。</p>
   </div>
 
+  <div class="photo-block">
+    <img src="../assets/meiji-camphor.jpg" alt="明治神宮の杜のクスノキ">
+    <p class="photo-block-caption">創建時に植えられた木々が、100年をかけて豊かな杜へと育った。</p>
+  </div>
+
   <div class="section">
     <span class="section-label">Highlights</span>
     <h2 class="section-title">見どころ</h2>
     <p>JR原宿駅からすぐの大鳥居（高さ約12m、台湾産ヒノキ材）をくぐり、参道の先に南神門・本殿が現れる。明治神宮御苑には縁結びのパワースポットとして知られる「清正井」もある。</p>
   </div>
 
-  <div class="gallery">
-    <div class="gallery-main">
-      <img id="meiji-gallery-main" src="../assets/meiji-hero.jpg" alt="明治神宮">
-    </div>
-    <div class="gallery-thumbs">
-      <button class="active" data-src="../assets/meiji-hero.jpg" onclick="switchGallery(this,'meiji')"><img src="../assets/meiji-hero.jpg" alt=""></button>
-      <button data-src="../assets/meiji-torii.jpg" onclick="switchGallery(this,'meiji')"><img src="../assets/meiji-torii.jpg" alt=""></button>
-      <button data-src="../assets/meiji-camphor.jpg" onclick="switchGallery(this,'meiji')"><img src="../assets/meiji-camphor.jpg" alt=""></button>
-      <button data-src="../assets/meiji-barrels.jpg" onclick="switchGallery(this,'meiji')"><img src="../assets/meiji-barrels.jpg" alt=""></button>
-    </div>
+  <div class="photo-block">
+    <img src="../assets/meiji-torii.jpg" alt="明治神宮の大鳥居">
+    <p class="photo-block-caption">台湾産ヒノキで作られた大鳥居。くぐった瞬間、都心の喧騒が遠のく。</p>
   </div>
 
   <div class="section">
@@ -161,6 +164,11 @@
     <h2 class="section-title">参拝のポイント</h2>
     <p>初詣の参拝者数は例年日本一を記録する。都心にありながら鎮守の森に包まれ、原宿・渋谷の喧騒から一歩入るだけで静寂な空間に変わる。週末は境内で神前式の花嫁行列に出会えることも多い。</p>
     <p>JR「原宿駅」または東京メトロ「明治神宮前〈原宿〉駅」から徒歩約1分。参道は本殿まで片道約10分あり、御苑（清正井）に立ち寄る場合は別途拝観料が必要。</p>
+  </div>
+
+  <div class="photo-block">
+    <img src="../assets/meiji-barrels.jpg" alt="奉納された酒樽">
+    <p class="photo-block-caption">全国の蔵元から奉納された酒樽が参道脇に並ぶ、明治神宮ならではの光景。</p>
   </div>
 
   <div class="section">
@@ -174,20 +182,9 @@
 <div class="page-footer">個別神社紹介ページ プロトタイプ・明治神宮 / design-lab（本番未反映）</div>
 
 <script>
-function switchGallery(btn, prefix) {
-  var main = document.getElementById(prefix + '-gallery-main');
-  main.style.opacity = '0';
-  setTimeout(function(){
-    main.src = btn.getAttribute('data-src');
-    main.style.opacity = '1';
-  }, 150);
-  var group = btn.parentElement.querySelectorAll('button');
-  group.forEach(function(b){ b.classList.remove('active'); });
-  btn.classList.add('active');
-}
 (function(){
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var items = document.querySelectorAll('.section, .gallery');
+  var items = document.querySelectorAll('.section, .photo-block');
   if (reduced || !('IntersectionObserver' in window)) {
     items.forEach(function(el){ el.classList.add('revealed'); });
     return;
