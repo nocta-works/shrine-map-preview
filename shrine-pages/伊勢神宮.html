@@ -107,10 +107,6 @@
   .photo-block.landscape { position: relative; left: 50%; width: min(1100px, 92vw); margin-left: calc(min(1100px, 92vw) / -2); }
   /* 縦型：本文カラムの中に収まる幅で、縦長のまま見せる */
   .photo-block.portrait { max-width: 420px; }
-  /* 縦型2枚を横並びに（本人指定・2026-09-09：原案（NatGeo）に寄せる） */
-  .photo-block.portrait-pair { max-width: 700px; }
-  .photo-pair { display: flex; gap: 10px; }
-  .photo-pair img { flex: 1; min-width: 0; width: 100%; height: auto; display: block; }
   .photo-block-caption {
     max-width: 620px; margin: 16px auto 0; padding: 0 6vw;
     font-size: 12.5px; color: var(--gold-muted); text-align: center; line-height: 1.7; letter-spacing: 0.02em;
@@ -155,6 +151,12 @@
     <p>20年に一度、社殿を新しく建て替え、神宝・装束まですべて新調する式年遷宮が飛鳥時代から続けられている。前回は2013年、次回は2033年の予定。</p>
   </div>
 
+  <!-- 以下、写真は撮影順（＝実際に参拝した順）に配置。本人指定・2026-09-09 -->
+  <div class="photo-block landscape">
+    <img src="../assets/ise-approach.jpg" alt="参道に架かる橋">
+    <p class="photo-block-caption">参道に架かる橋。早朝、まずは外宮から参拝の歩みを進める。</p>
+  </div>
+
   <div class="photo-block portrait">
     <img src="../assets/ise-sengu.jpg" alt="次回式年遷宮の御敷地">
     <p class="photo-block-caption">隣に用意された、次の式年遷宮のための御敷地。20年後、同じ形の社殿がここに建て替えられる。</p>
@@ -167,16 +169,18 @@
   </div>
 
   <div class="photo-block landscape">
-    <img src="../assets/ise-shrine3.jpg" alt="神明造の社殿、千木と鰹木">
-    <p class="photo-block-caption">千木と鰹木を戴く神明造の屋根。杉の森に囲まれて静かに佇む。</p>
+    <img src="../assets/ise-shrine2.jpg" alt="外宮の別宮・多賀宮">
+    <p class="photo-block-caption">外宮の別宮・多賀宮。豊受大御神の荒御魂を祀る。</p>
   </div>
 
-  <div class="photo-block portrait-pair">
-    <div class="photo-pair">
-      <img src="../assets/ise-tree.jpg" alt="境内の御神木">
-      <img src="../assets/ise-torii2.jpg" alt="参道の鳥居と瑞垣">
-    </div>
-    <p class="photo-block-caption">境内の御神木と、参道の先に立つ鳥居。どちらも幾度もの式年遷宮を見送ってきた。</p>
+  <div class="photo-block landscape">
+    <img src="../assets/ise-backlit.jpg" alt="朝日を背にした鳥居のシルエット">
+    <p class="photo-block-caption">朝日を背に浮かび上がる鳥居のシルエット。</p>
+  </div>
+
+  <div class="photo-block portrait">
+    <img src="../assets/ise-tree.jpg" alt="境内の御神木">
+    <p class="photo-block-caption">境内にそびえる御神木。式年遷宮を幾度も見送ってきた古木も少なくない。</p>
   </div>
 
   <div class="section">
@@ -191,19 +195,14 @@
     <p class="photo-block-caption">杉の梢から差し込む光。早朝の参道は、この静けさに包まれる。</p>
   </div>
 
-  <div class="photo-block landscape">
-    <img src="../assets/ise-river.jpg" alt="五十鈴川の御手洗場">
-    <p class="photo-block-caption">五十鈴川の御手洗場。参拝前にこの清流で手を清めるのが古くからの習わし。</p>
-  </div>
-
-  <div class="photo-block landscape">
-    <img src="../assets/ise-approach.jpg" alt="内宮への参道">
-    <p class="photo-block-caption">内宮への参道。玉砂利を踏みしめて進むうちに、少しずつ空気が変わっていく。</p>
-  </div>
-
   <div class="photo-block portrait">
-    <img src="../assets/ise-riverside.jpg" alt="五十鈴川沿いの町並み">
-    <p class="photo-block-caption">五十鈴川沿いの町並み。参拝を終えた帰り道、川面が光を返す。</p>
+    <img src="../assets/ise-torii2.jpg" alt="参道の鳥居と瑞垣">
+    <p class="photo-block-caption">参道の先に立つ鳥居と瑞垣。</p>
+  </div>
+
+  <div class="photo-block landscape">
+    <img src="../assets/ise-shrine3.jpg" alt="神明造の社殿、千木と鰹木">
+    <p class="photo-block-caption">千木と鰹木を戴く神明造の屋根。杉の森に囲まれて静かに佇む。</p>
   </div>
 
   <div class="section">
@@ -213,18 +212,13 @@
   </div>
 
   <div class="photo-block landscape">
-    <img src="../assets/ise-backlit.jpg" alt="朝日を背にした鳥居のシルエット">
-    <p class="photo-block-caption">朝日を背に浮かび上がる鳥居のシルエット。</p>
-  </div>
-
-  <div class="photo-block landscape">
     <img src="../assets/ise-river2.jpg" alt="五十鈴川、梅の花咲く頃">
     <p class="photo-block-caption">五十鈴川の下流。梅がほころぶ頃、境内の表情も少しずつ変わる。</p>
   </div>
 
-  <div class="photo-block landscape">
-    <img src="../assets/ise-shrine2.jpg" alt="伊勢神宮の社殿">
-    <p class="photo-block-caption">常若の思想のもとで幾度も建て替えられながら、変わらぬ姿を保ち続ける社殿。</p>
+  <div class="photo-block portrait">
+    <img src="../assets/ise-riverside.jpg" alt="五十鈴川沿いの町並み">
+    <p class="photo-block-caption">五十鈴川沿いの町並み。参拝を終えた帰り道、川面が光を返す。</p>
   </div>
 
 </div>

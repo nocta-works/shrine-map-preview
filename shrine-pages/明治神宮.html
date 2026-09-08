@@ -100,10 +100,6 @@
   .photo-block.landscape { position: relative; left: 50%; width: min(1100px, 92vw); margin-left: calc(min(1100px, 92vw) / -2); }
   /* 縦型：本文カラムの中に収まる幅で、縦長のまま見せる */
   .photo-block.portrait { max-width: 420px; }
-  /* 縦型2枚を横並びに（本人指定・2026-09-09：原案（NatGeo）に寄せる） */
-  .photo-block.portrait-pair { max-width: 700px; }
-  .photo-pair { display: flex; gap: 10px; }
-  .photo-pair img { flex: 1; min-width: 0; width: 100%; height: auto; display: block; }
   .photo-block-caption {
     max-width: 620px; margin: 16px auto 0; padding: 0 6vw;
     font-size: 12.5px; color: var(--gold-muted); text-align: center; line-height: 1.7; letter-spacing: 0.02em;
@@ -148,9 +144,15 @@
     <p>現在は自然林とほとんど見分けがつかないほどに生育し、「代々木の杜」と呼ばれる都市林の代表例になっている。</p>
   </div>
 
+  <!-- 以下、写真は撮影順（＝実際に参拝した順）に配置。本人指定・2026-09-09 -->
+  <div class="photo-block portrait">
+    <img src="../assets/meiji-torii.jpg" alt="明治神宮の大鳥居">
+    <p class="photo-block-caption">参道の入口にそびえる大鳥居。台湾産ヒノキで作られている。</p>
+  </div>
+
   <div class="photo-block landscape">
-    <img src="../assets/meiji-canopy.jpg" alt="明治神宮の杜の梢">
-    <p class="photo-block-caption">100年をかけて育った杜の梢。都心とは思えない木漏れ日が差し込む。</p>
+    <img src="../assets/meiji-wine.jpg" alt="奉納されたワイン樽">
+    <p class="photo-block-caption">境内に並ぶ、フランス・ブルゴーニュから奉納されたワイン樽。「和魂洋才」を掲げた明治天皇の御精神を今に伝える。</p>
   </div>
 
   <div class="section">
@@ -159,22 +161,14 @@
     <p>JR原宿駅からすぐの大鳥居（高さ約12m、台湾産ヒノキ材）をくぐり、参道の先に南神門・本殿が現れる。明治神宮御苑には縁結びのパワースポットとして知られる「清正井」もある。</p>
   </div>
 
+  <div class="photo-block portrait">
+    <img src="../assets/meiji-branch.jpg" alt="枝越しに見える鳥居">
+    <p class="photo-block-caption">大きく張り出した枝の向こうに、参道の鳥居が小さく見える。</p>
+  </div>
+
   <div class="photo-block landscape">
     <img src="../assets/meiji-plaza.jpg" alt="本殿前の広場と夫婦楠">
     <p class="photo-block-caption">南神門をくぐった先に本殿が現れる。夫婦楠越しに望む、境内でもっとも開けた広場。</p>
-  </div>
-
-  <div class="photo-block portrait-pair">
-    <div class="photo-pair">
-      <img src="../assets/meiji-camphor.jpg" alt="明治神宮の杜のクスノキ">
-      <img src="../assets/meiji-torii.jpg" alt="明治神宮の大鳥居">
-    </div>
-    <p class="photo-block-caption">創建時に植えられた木々が育てた杜と、参道の先にそびえる大鳥居。</p>
-  </div>
-
-  <div class="photo-block portrait">
-    <img src="../assets/meiji-meotokusu.jpg" alt="夫婦楠">
-    <p class="photo-block-caption">2本の楠を注連縄で結んだ「夫婦楠」。縁結びの象徴として親しまれる。</p>
   </div>
 
   <div class="section">
@@ -185,8 +179,13 @@
   </div>
 
   <div class="photo-block portrait">
-    <img src="../assets/meiji-branch.jpg" alt="枝越しに見える鳥居">
-    <p class="photo-block-caption">大きく張り出した枝の向こうに、参道の鳥居が小さく見える。</p>
+    <img src="../assets/meiji-meotokusu.jpg" alt="夫婦楠">
+    <p class="photo-block-caption">2本の楠を注連縄で結んだ「夫婦楠」。縁結びの象徴として親しまれる。</p>
+  </div>
+
+  <div class="photo-block landscape">
+    <img src="../assets/meiji-canopy.jpg" alt="明治神宮の杜の梢">
+    <p class="photo-block-caption">100年をかけて育った杜の梢。都心とは思えない木漏れ日が差し込む。</p>
   </div>
 
   <div class="section">
@@ -197,12 +196,7 @@
 
   <div class="photo-block landscape">
     <img src="../assets/meiji-barrels.jpg" alt="奉納された酒樽">
-    <p class="photo-block-caption">全国の蔵元から奉納された酒樽。</p>
-  </div>
-
-  <div class="photo-block landscape">
-    <img src="../assets/meiji-wine.jpg" alt="奉納されたワイン樽">
-    <p class="photo-block-caption">酒樽の向かいにはフランス・ブルゴーニュから奉納されたワイン樽が並ぶ。「和魂洋才」を掲げた明治天皇の御精神を今に伝える。</p>
+    <p class="photo-block-caption">全国の蔵元から奉納された酒樽が参道脇に並ぶ、明治神宮ならではの光景。</p>
   </div>
 
 </div>
