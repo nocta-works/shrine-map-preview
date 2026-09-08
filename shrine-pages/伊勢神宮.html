@@ -36,6 +36,15 @@
     border: 1px solid var(--border-4);
   }
 
+  /* 言語切替（本人指定・2026-09-09：地図の言語切替と同じ考え方をこのページにも導入） */
+  .lang-toggle { position: fixed; top: 16px; right: 16px; z-index: 10; display: flex; gap: 4px; }
+  .lang-btn {
+    font-size: 11px; letter-spacing: 0.05em; padding: 6px 12px; border-radius: 20px;
+    border: 1px solid var(--border-4); background: rgba(0,0,0,0.4); color: var(--tan-text);
+    cursor: pointer; font-family: inherit;
+  }
+  .lang-btn.active { background: rgba(var(--gold-glow-rgb),0.22); border-color: var(--gold); color: var(--gold); }
+
   /* ── ヒーロー：写真＋神社名 ── */
   .shrine-hero {
     position: relative; height: 78vh; min-height: 460px;
@@ -121,22 +130,26 @@
 </head>
 <body>
 
-<a href="../index.html#mock-app" class="back-link">← 地図に戻る</a>
+<a href="../index.html#mock-app" class="back-link" data-en="← Back to Map">← 地図に戻る</a>
+<div class="lang-toggle" id="lang-toggle">
+  <button type="button" class="lang-btn active" data-lang="ja">日本語</button>
+  <button type="button" class="lang-btn" data-lang="en">EN</button>
+</div>
 
 <div class="shrine-hero">
-  <img src="../assets/ise-hero.jpg" alt="伊勢神宮 鳥居">
+  <img src="../assets/ise-hero.jpg" alt="伊勢神宮 鳥居" data-alt-en="Ise Jingu torii gate">
   <div class="shrine-hero-overlay"></div>
   <div class="shrine-hero-content">
-    <span class="shrine-badge">神宮</span>
-    <span class="shrine-name-en">Ise Jingu</span>
-    <h1 class="shrine-name-ja">伊勢神宮</h1>
+    <span class="shrine-badge" data-en="Jingu">神宮</span>
+    <span class="shrine-name-en" data-en="伊勢神宮">Ise Jingu</span>
+    <h1 class="shrine-name-ja" data-en="Ise Jingu">伊勢神宮</h1>
     <div class="shrine-meta">
-      <span><b>御祭神</b>天照坐皇大御神（内宮）・豊受大御神（外宮）</span>
-      <span><b>所在地</b>三重県伊勢市</span>
+      <span><b data-en="Enshrined Kami">御祭神</b><span data-en="Amaterasu-Omikami (Inner Shrine) · Toyouke-Omikami (Outer Shrine)">天照坐皇大御神（内宮）・豊受大御神（外宮）</span></span>
+      <span><b data-en="Location">所在地</b><span data-en="Ise, Mie Prefecture">三重県伊勢市</span></span>
     </div>
     <div class="shrine-links">
-      <a href="https://www.google.com/maps/search/伊勢神宮" target="_blank" rel="noopener" class="shrine-link gmaps">📍 地図</a>
-      <a href="https://www.google.com/search?q=伊勢神宮+公式" target="_blank" rel="noopener" class="shrine-link official">🌐 公式</a>
+      <a href="https://www.google.com/maps/search/伊勢神宮" target="_blank" rel="noopener" class="shrine-link gmaps" data-en="📍 Map">📍 地図</a>
+      <a href="https://www.google.com/search?q=伊勢神宮+公式" target="_blank" rel="noopener" class="shrine-link official" data-en="🌐 Official">🌐 公式</a>
       <a href="https://ja.wikipedia.org/wiki/伊勢神宮" target="_blank" rel="noopener" class="shrine-link wiki">📖 Wiki</a>
     </div>
   </div>
@@ -146,79 +159,79 @@
 
   <div class="section">
     <span class="section-label">History</span>
-    <h2 class="section-title">由緒・創建</h2>
-    <p>内宮（皇大神宮）は約2000年前、天照大御神が伊勢の地に鎮座されたと伝わる。外宮（豊受大神宮）は約1500年前、天照大御神の食事を司る豊受大御神を祀る。正式名称は「神宮」で、全国約8万社の神社の中心的な存在とされる。</p>
-    <p>20年に一度、社殿を新しく建て替え、神宝・装束まですべて新調する式年遷宮が飛鳥時代から続けられている。前回は2013年、次回は2033年の予定。</p>
+    <h2 class="section-title" data-en="History &amp; Founding">由緒・創建</h2>
+    <p data-en="The Inner Shrine (Kotai Jingu) is said to have been founded some 2,000 years ago, when Amaterasu-Omikami came to rest in Ise. The Outer Shrine (Toyouke Daijingu), dating back roughly 1,500 years, enshrines Toyouke-Omikami, who provides for Amaterasu's meals. Officially known simply as &quot;Jingu,&quot; it stands at the spiritual center of Japan's roughly 80,000 Shinto shrines.">内宮（皇大神宮）は約2000年前、天照大御神が伊勢の地に鎮座されたと伝わる。外宮（豊受大神宮）は約1500年前、天照大御神の食事を司る豊受大御神を祀る。正式名称は「神宮」で、全国約8万社の神社の中心的な存在とされる。</p>
+    <p data-en="Since the Asuka period, the shrine has observed Shikinen Sengu — a ritual rebuilding held every 20 years in which the entire sanctuary, along with its sacred treasures and vestments, is renewed. The most recent took place in 2013; the next is planned for 2033.">20年に一度、社殿を新しく建て替え、神宝・装束まですべて新調する式年遷宮が飛鳥時代から続けられている。前回は2013年、次回は2033年の予定。</p>
   </div>
 
   <!-- 以下、写真は撮影順（＝実際に参拝した順）に配置。本人指定・2026-09-09 -->
   <div class="photo-block landscape">
-    <img src="../assets/ise-approach.jpg" alt="参道に架かる橋">
-    <p class="photo-block-caption">参道に架かる橋。早朝、まずは外宮から参拝の歩みを進める。</p>
+    <img src="../assets/ise-approach.jpg" alt="参道に架かる橋" data-alt-en="A bridge on the approach">
+    <p class="photo-block-caption" data-en="A bridge along the approach. The visit traditionally begins at dawn, at the Outer Shrine.">参道に架かる橋。早朝、まずは外宮から参拝の歩みを進める。</p>
   </div>
 
   <div class="photo-block portrait">
-    <img src="../assets/ise-sengu.jpg" alt="次回式年遷宮の御敷地">
-    <p class="photo-block-caption">隣に用意された、次の式年遷宮のための御敷地。20年後、同じ形の社殿がここに建て替えられる。</p>
+    <img src="../assets/ise-sengu.jpg" alt="次回式年遷宮の御敷地" data-alt-en="The vacant site for the next Shikinen Sengu">
+    <p class="photo-block-caption" data-en="The vacant plot reserved for the next Shikinen Sengu. In twenty years, an identical sanctuary will rise here.">隣に用意された、次の式年遷宮のための御敷地。20年後、同じ形の社殿がここに建て替えられる。</p>
   </div>
 
   <div class="section">
     <span class="section-label">Highlights</span>
-    <h2 class="section-title">見どころ</h2>
-    <p>宇治橋を渡って五十鈴川のほとりへ。神明造の社殿は釘を一切使わない古代建築様式で、白木の美しさが式年遷宮のたびに保たれる。内宮の正宮のほか、別宮の荒祭宮・風日祈宮なども参拝の価値が高い。</p>
+    <h2 class="section-title" data-en="Highlights">見どころ</h2>
+    <p data-en="Cross Uji Bridge to reach the banks of the Isuzu River. The shrine buildings, built in the ancient shinmei-zukuri style without a single nail, keep their pale, unpainted beauty fresh with every rebuilding. Beyond the Inner Shrine's main sanctuary, the auxiliary shrines of Aramatsuri-no-Miya and Kazahinomi-no-Miya are equally worth the visit.">宇治橋を渡って五十鈴川のほとりへ。神明造の社殿は釘を一切使わない古代建築様式で、白木の美しさが式年遷宮のたびに保たれる。内宮の正宮のほか、別宮の荒祭宮・風日祈宮なども参拝の価値が高い。</p>
   </div>
 
   <div class="photo-block landscape">
-    <img src="../assets/ise-shrine2.jpg" alt="外宮の別宮・多賀宮">
-    <p class="photo-block-caption">外宮の別宮・多賀宮。豊受大御神の荒御魂を祀る。</p>
+    <img src="../assets/ise-shrine2.jpg" alt="外宮の別宮・多賀宮" data-alt-en="Taka-no-Miya, an auxiliary shrine of the Outer Shrine">
+    <p class="photo-block-caption" data-en="Taka-no-Miya, an auxiliary shrine of the Outer Shrine, enshrines the aramitama — the vigorous spirit — of Toyouke-Omikami.">外宮の別宮・多賀宮。豊受大御神の荒御魂を祀る。</p>
   </div>
 
   <div class="photo-block landscape">
-    <img src="../assets/ise-backlit.jpg" alt="朝日を背にした鳥居のシルエット">
-    <p class="photo-block-caption">朝日を背に浮かび上がる鳥居のシルエット。</p>
+    <img src="../assets/ise-backlit.jpg" alt="朝日を背にした鳥居のシルエット" data-alt-en="A torii silhouetted against the morning sun">
+    <p class="photo-block-caption" data-en="A torii silhouetted against the rising sun.">朝日を背に浮かび上がる鳥居のシルエット。</p>
   </div>
 
   <div class="photo-block portrait">
-    <img src="../assets/ise-tree.jpg" alt="境内の御神木">
-    <p class="photo-block-caption">境内にそびえる御神木。式年遷宮を幾度も見送ってきた古木も少なくない。</p>
+    <img src="../assets/ise-tree.jpg" alt="境内の御神木" data-alt-en="A sacred tree on the shrine grounds">
+    <p class="photo-block-caption" data-en="A sacred tree towering over the grounds. Many such trees have stood witness to generation after generation of Shikinen Sengu.">境内にそびえる御神木。式年遷宮を幾度も見送ってきた古木も少なくない。</p>
   </div>
 
   <div class="section">
     <span class="section-label">Visiting Tips</span>
-    <h2 class="section-title">参拝のポイント</h2>
-    <p>伝統的な順序は外宮から内宮へ。早朝5時からの参拝は空気が澄み、参道の杉並木も一段と美しく見える。内宮・外宮それぞれで御朱印の授与所が異なるので両方立ち寄りたい。</p>
-    <p>外宮はJR/近鉄「伊勢市駅」から徒歩約5分、内宮は同駅からバスで約20分（最寄りは「五十鈴川駅」）。外宮・内宮間もバスで結ばれており、徒歩での移動は距離があるため公共交通の利用が現実的。</p>
+    <h2 class="section-title" data-en="Visiting Tips">参拝のポイント</h2>
+    <p data-en="Tradition calls for visiting the Outer Shrine before the Inner Shrine. Arriving at 5am, when the gates open, rewards you with clear morning air and cedar-lined paths at their most beautiful. Goshuin stamps are issued separately at each shrine, so it's worth stopping at both.">伝統的な順序は外宮から内宮へ。早朝5時からの参拝は空気が澄み、参道の杉並木も一段と美しく見える。内宮・外宮それぞれで御朱印の授与所が異なるので両方立ち寄りたい。</p>
+    <p data-en="The Outer Shrine is about a 5-minute walk from JR/Kintetsu Ise-shi Station; the Inner Shrine is roughly a 20-minute bus ride from the same station (nearest station: Isuzugawa). Buses also connect the two shrines — the distance between them makes public transport the practical choice over walking.">外宮はJR/近鉄「伊勢市駅」から徒歩約5分、内宮は同駅からバスで約20分（最寄りは「五十鈴川駅」）。外宮・内宮間もバスで結ばれており、徒歩での移動は距離があるため公共交通の利用が現実的。</p>
   </div>
 
   <div class="photo-block landscape">
-    <img src="../assets/ise-komorebi.jpg" alt="杉木立に差し込む木漏れ日">
-    <p class="photo-block-caption">杉の梢から差し込む光。早朝の参道は、この静けさに包まれる。</p>
+    <img src="../assets/ise-komorebi.jpg" alt="杉木立に差し込む木漏れ日" data-alt-en="Sunlight filtering through a cedar grove">
+    <p class="photo-block-caption" data-en="Light filtering through the cedar canopy. This quiet fills the approach in the early morning.">杉の梢から差し込む光。早朝の参道は、この静けさに包まれる。</p>
   </div>
 
   <div class="photo-block portrait">
-    <img src="../assets/ise-torii2.jpg" alt="参道の鳥居と瑞垣">
-    <p class="photo-block-caption">参道の先に立つ鳥居と瑞垣。</p>
+    <img src="../assets/ise-torii2.jpg" alt="参道の鳥居と瑞垣" data-alt-en="A torii and sacred fence along the approach">
+    <p class="photo-block-caption" data-en="A torii and sacred fence along the approach.">参道の先に立つ鳥居と瑞垣。</p>
   </div>
 
   <div class="photo-block landscape">
-    <img src="../assets/ise-shrine3.jpg" alt="神明造の社殿、千木と鰹木">
-    <p class="photo-block-caption">千木と鰹木を戴く神明造の屋根。杉の森に囲まれて静かに佇む。</p>
+    <img src="../assets/ise-shrine3.jpg" alt="神明造の社殿、千木と鰹木" data-alt-en="A shinmei-zukuri roof with chigi and katsuogi">
+    <p class="photo-block-caption" data-en="A shinmei-zukuri roof crowned with chigi and katsuogi beams, standing quietly amid the cedar forest.">千木と鰹木を戴く神明造の屋根。杉の森に囲まれて静かに佇む。</p>
   </div>
 
   <div class="section">
     <span class="section-label">Background</span>
-    <h2 class="section-title">文化的背景</h2>
-    <p>「神宮」という言葉は本来、伊勢神宮そのものを指す。式年遷宮は建物だけでなく神宝・装束まですべて新しく作り直す「常若（とこわか）」という思想に基づいており、老朽化対策ではなく常に清浄な状態を保つための制度。江戸時代には庶民が伊勢を目指す「おかげ参り」が一大ブームとなった。</p>
+    <h2 class="section-title" data-en="Cultural Background">文化的背景</h2>
+    <p data-en="The word &quot;Jingu&quot; originally referred to Ise Jingu alone. Shikinen Sengu embodies the idea of tokowaka, or eternal renewal — rebuilding not just the structures but the sacred treasures and vestments as well, not to repair decay but to keep the shrine perpetually pure. During the Edo period, mass pilgrimages to Ise known as okage-mairi became a nationwide phenomenon.">「神宮」という言葉は本来、伊勢神宮そのものを指す。式年遷宮は建物だけでなく神宝・装束まですべて新しく作り直す「常若（とこわか）」という思想に基づいており、老朽化対策ではなく常に清浄な状態を保つための制度。江戸時代には庶民が伊勢を目指す「おかげ参り」が一大ブームとなった。</p>
   </div>
 
   <div class="photo-block landscape">
-    <img src="../assets/ise-river2.jpg" alt="五十鈴川、梅の花咲く頃">
-    <p class="photo-block-caption">五十鈴川の下流。梅がほころぶ頃、境内の表情も少しずつ変わる。</p>
+    <img src="../assets/ise-river2.jpg" alt="五十鈴川、梅の花咲く頃" data-alt-en="The Isuzu River as plum blossoms bloom">
+    <p class="photo-block-caption" data-en="The lower reaches of the Isuzu River. As the plum blossoms open, the shrine grounds begin to change with the season.">五十鈴川の下流。梅がほころぶ頃、境内の表情も少しずつ変わる。</p>
   </div>
 
   <div class="photo-block portrait">
-    <img src="../assets/ise-riverside.jpg" alt="五十鈴川沿いの町並み">
-    <p class="photo-block-caption">五十鈴川沿いの町並み。参拝を終えた帰り道、川面が光を返す。</p>
+    <img src="../assets/ise-riverside.jpg" alt="五十鈴川沿いの町並み" data-alt-en="The riverside town along the Isuzu River">
+    <p class="photo-block-caption" data-en="The riverside town along the Isuzu. On the walk back from worship, the water catches the light.">五十鈴川沿いの町並み。参拝を終えた帰り道、川面が光を返す。</p>
   </div>
 
 </div>
@@ -239,6 +252,32 @@
     });
   }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
   items.forEach(function(el){ io.observe(el); });
+})();
+
+// 言語切替（本人指定・2026-09-09）：地図と同じJA/EN切替をこのページにも導入。
+// data-en属性を持つ要素だけを対象に、初回切替時に元のテキスト（日本語）を
+// キャッシュしてから入れ替える。alt属性はdata-alt-enで別途対応。
+(function(){
+  function applyLang(lang){
+    document.querySelectorAll('[data-en]').forEach(function(el){
+      if (el.dataset.jaCache === undefined) el.dataset.jaCache = el.textContent;
+      el.textContent = lang === 'en' ? el.getAttribute('data-en') : el.dataset.jaCache;
+    });
+    document.querySelectorAll('img[data-alt-en]').forEach(function(el){
+      if (el.dataset.altJaCache === undefined) el.dataset.altJaCache = el.getAttribute('alt') || '';
+      el.setAttribute('alt', lang === 'en' ? el.getAttribute('data-alt-en') : el.dataset.altJaCache);
+    });
+    document.querySelectorAll('.lang-btn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+    });
+  }
+  var toggle = document.getElementById('lang-toggle');
+  if (toggle) {
+    toggle.addEventListener('click', function(e){
+      var btn = e.target.closest('.lang-btn');
+      if (btn) applyLang(btn.getAttribute('data-lang'));
+    });
+  }
 })();
 </script>
 </body>

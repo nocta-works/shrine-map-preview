@@ -31,6 +31,15 @@
     border: 1px solid var(--border-4);
   }
 
+  /* 言語切替（本人指定・2026-09-09：地図の言語切替と同じ考え方をこのページにも導入） */
+  .lang-toggle { position: fixed; top: 16px; right: 16px; z-index: 10; display: flex; gap: 4px; }
+  .lang-btn {
+    font-size: 11px; letter-spacing: 0.05em; padding: 6px 12px; border-radius: 20px;
+    border: 1px solid var(--border-4); background: rgba(0,0,0,0.4); color: var(--tan-text);
+    cursor: pointer; font-family: inherit;
+  }
+  .lang-btn.active { background: rgba(var(--gold-glow-rgb),0.22); border-color: var(--gold); color: var(--gold); }
+
   .shrine-hero {
     position: relative; height: 78vh; min-height: 460px;
     display: flex; align-items: flex-end;
@@ -114,22 +123,26 @@
 </head>
 <body>
 
-<a href="../index.html#mock-app" class="back-link">← 地図に戻る</a>
+<a href="../index.html#mock-app" class="back-link" data-en="← Back to Map">← 地図に戻る</a>
+<div class="lang-toggle" id="lang-toggle">
+  <button type="button" class="lang-btn active" data-lang="ja">日本語</button>
+  <button type="button" class="lang-btn" data-lang="en">EN</button>
+</div>
 
 <div class="shrine-hero">
-  <img src="../assets/meiji-hero.jpg" alt="明治神宮 南神門">
+  <img src="../assets/meiji-hero.jpg" alt="明治神宮 南神門" data-alt-en="Meiji Jingu Minami-shinmon gate">
   <div class="shrine-hero-overlay"></div>
   <div class="shrine-hero-content">
-    <span class="shrine-badge">神宮</span>
-    <span class="shrine-name-en">Meiji Jingu</span>
-    <h1 class="shrine-name-ja">明治神宮</h1>
+    <span class="shrine-badge" data-en="Jingu">神宮</span>
+    <span class="shrine-name-en" data-en="明治神宮">Meiji Jingu</span>
+    <h1 class="shrine-name-ja" data-en="Meiji Jingu">明治神宮</h1>
     <div class="shrine-meta">
-      <span><b>御祭神</b>明治天皇・昭憲皇太后</span>
-      <span><b>所在地</b>東京都渋谷区</span>
+      <span><b data-en="Enshrined Kami">御祭神</b><span data-en="Emperor Meiji and Empress Shoken">明治天皇・昭憲皇太后</span></span>
+      <span><b data-en="Location">所在地</b><span data-en="Shibuya, Tokyo">東京都渋谷区</span></span>
     </div>
     <div class="shrine-links">
-      <a href="https://www.google.com/maps/search/明治神宮" target="_blank" rel="noopener" class="shrine-link gmaps">📍 地図</a>
-      <a href="https://www.google.com/search?q=明治神宮+公式" target="_blank" rel="noopener" class="shrine-link official">🌐 公式</a>
+      <a href="https://www.google.com/maps/search/明治神宮" target="_blank" rel="noopener" class="shrine-link gmaps" data-en="📍 Map">📍 地図</a>
+      <a href="https://www.google.com/search?q=明治神宮+公式" target="_blank" rel="noopener" class="shrine-link official" data-en="🌐 Official">🌐 公式</a>
       <a href="https://ja.wikipedia.org/wiki/明治神宮" target="_blank" rel="noopener" class="shrine-link wiki">📖 Wiki</a>
     </div>
   </div>
@@ -139,64 +152,64 @@
 
   <div class="section">
     <span class="section-label">History</span>
-    <h2 class="section-title">由緒・創建</h2>
-    <p>大正9年（1920）、明治天皇と昭憲皇太后を祀る神社として創建。鎮座地一帯はもともと荒地に近い状態だったが、全国から奉献された約10万本・365種の樹木を計画的に植林し、100年後を見据えた人工の森として造成された。</p>
-    <p>現在は自然林とほとんど見分けがつかないほどに生育し、「代々木の杜」と呼ばれる都市林の代表例になっている。</p>
+    <h2 class="section-title" data-en="History &amp; Founding">由緒・創建</h2>
+    <p data-en="Founded in 1920 to enshrine Emperor Meiji and Empress Shoken, the shrine sits on land that was once little more than wasteland. Roughly 100,000 trees of 365 species, donated from across Japan, were deliberately planted here as a forest engineered to mature a century into the future.">大正9年（1920）、明治天皇と昭憲皇太后を祀る神社として創建。鎮座地一帯はもともと荒地に近い状態だったが、全国から奉献された約10万本・365種の樹木を計画的に植林し、100年後を見据えた人工の森として造成された。</p>
+    <p data-en="Today it has grown so dense it is nearly indistinguishable from a natural forest, and stands as a landmark example of urban woodland known as the Yoyogi Forest.">現在は自然林とほとんど見分けがつかないほどに生育し、「代々木の杜」と呼ばれる都市林の代表例になっている。</p>
   </div>
 
   <!-- 以下、写真は撮影順（＝実際に参拝した順）に配置。本人指定・2026-09-09 -->
   <div class="photo-block portrait">
-    <img src="../assets/meiji-torii.jpg" alt="明治神宮の大鳥居">
-    <p class="photo-block-caption">参道の入口にそびえる大鳥居。台湾産ヒノキで作られている。</p>
+    <img src="../assets/meiji-torii.jpg" alt="明治神宮の大鳥居" data-alt-en="The great torii of Meiji Jingu">
+    <p class="photo-block-caption" data-en="The great torii at the entrance to the approach, built from Taiwanese cypress.">参道の入口にそびえる大鳥居。台湾産ヒノキで作られている。</p>
   </div>
 
   <div class="photo-block landscape">
-    <img src="../assets/meiji-wine.jpg" alt="奉納されたワイン樽">
-    <p class="photo-block-caption">境内に並ぶ、フランス・ブルゴーニュから奉納されたワイン樽。「和魂洋才」を掲げた明治天皇の御精神を今に伝える。</p>
+    <img src="../assets/meiji-wine.jpg" alt="奉納されたワイン樽" data-alt-en="Wine casks donated to the shrine">
+    <p class="photo-block-caption" data-en="Wine casks donated from Burgundy, France, lined up on the grounds — a living reminder of Emperor Meiji's spirit of wakon-yosai, &quot;Japanese soul, Western learning.&quot;">境内に並ぶ、フランス・ブルゴーニュから奉納されたワイン樽。「和魂洋才」を掲げた明治天皇の御精神を今に伝える。</p>
   </div>
 
   <div class="section">
     <span class="section-label">Highlights</span>
-    <h2 class="section-title">見どころ</h2>
-    <p>JR原宿駅からすぐの大鳥居（高さ約12m、台湾産ヒノキ材）をくぐり、参道の先に南神門・本殿が現れる。明治神宮御苑には縁結びのパワースポットとして知られる「清正井」もある。</p>
+    <h2 class="section-title" data-en="Highlights">見どころ</h2>
+    <p data-en="Just steps from JR Harajuku Station, pass beneath the roughly 12-meter torii of Taiwanese cypress, and the Minami-shinmon gate and main hall appear at the end of the approach. Within the Meiji Jingu Inner Garden lies Kiyomasa's Well, known as a spot for good fortune in love.">JR原宿駅からすぐの大鳥居（高さ約12m、台湾産ヒノキ材）をくぐり、参道の先に南神門・本殿が現れる。明治神宮御苑には縁結びのパワースポットとして知られる「清正井」もある。</p>
   </div>
 
   <div class="photo-block portrait">
-    <img src="../assets/meiji-branch.jpg" alt="枝越しに見える鳥居">
-    <p class="photo-block-caption">大きく張り出した枝の向こうに、参道の鳥居が小さく見える。</p>
+    <img src="../assets/meiji-branch.jpg" alt="枝越しに見える鳥居" data-alt-en="A torii glimpsed through the branches">
+    <p class="photo-block-caption" data-en="Beyond a sweeping branch, a torii on the approach appears small in the distance.">大きく張り出した枝の向こうに、参道の鳥居が小さく見える。</p>
   </div>
 
   <div class="photo-block landscape">
-    <img src="../assets/meiji-plaza.jpg" alt="本殿前の広場と夫婦楠">
-    <p class="photo-block-caption">南神門をくぐった先に本殿が現れる。夫婦楠越しに望む、境内でもっとも開けた広場。</p>
+    <img src="../assets/meiji-plaza.jpg" alt="本殿前の広場と夫婦楠" data-alt-en="The plaza before the main hall, with the Meoto Kusu">
+    <p class="photo-block-caption" data-en="Beyond the Minami-shinmon gate, the main hall comes into view — seen here past the Meoto Kusu camphors, across the most open plaza on the grounds.">南神門をくぐった先に本殿が現れる。夫婦楠越しに望む、境内でもっとも開けた広場。</p>
   </div>
 
   <div class="section">
     <span class="section-label">Visiting Tips</span>
-    <h2 class="section-title">参拝のポイント</h2>
-    <p>初詣の参拝者数は例年日本一を記録する。都心にありながら鎮守の森に包まれ、原宿・渋谷の喧騒から一歩入るだけで静寂な空間に変わる。週末は境内で神前式の花嫁行列に出会えることも多い。</p>
-    <p>JR「原宿駅」または東京メトロ「明治神宮前〈原宿〉駅」から徒歩約1分。参道は本殿まで片道約10分あり、御苑（清正井）に立ち寄る場合は別途拝観料が必要。</p>
+    <h2 class="section-title" data-en="Visiting Tips">参拝のポイント</h2>
+    <p data-en="Meiji Jingu draws the largest hatsumode crowds of any shrine in Japan each New Year. Despite sitting in the heart of the city, it is wrapped in a protective forest — one step in from the bustle of Harajuku and Shibuya, and the space turns utterly still. On weekends, visitors often catch a Shinto wedding procession crossing the grounds.">初詣の参拝者数は例年日本一を記録する。都心にありながら鎮守の森に包まれ、原宿・渋谷の喧騒から一歩入るだけで静寂な空間に変わる。週末は境内で神前式の花嫁行列に出会えることも多い。</p>
+    <p data-en="About a 1-minute walk from JR Harajuku Station or Tokyo Metro's Meiji-jingumae ⟨Harajuku⟩ Station. The approach to the main hall takes roughly 10 minutes each way; visiting the Inner Garden (Kiyomasa's Well) requires a separate admission fee.">JR「原宿駅」または東京メトロ「明治神宮前〈原宿〉駅」から徒歩約1分。参道は本殿まで片道約10分あり、御苑（清正井）に立ち寄る場合は別途拝観料が必要。</p>
   </div>
 
   <div class="photo-block portrait">
-    <img src="../assets/meiji-meotokusu.jpg" alt="夫婦楠">
-    <p class="photo-block-caption">2本の楠を注連縄で結んだ「夫婦楠」。縁結びの象徴として親しまれる。</p>
+    <img src="../assets/meiji-meotokusu.jpg" alt="夫婦楠" data-alt-en="The Meoto Kusu, a pair of joined camphor trees">
+    <p class="photo-block-caption" data-en="Meoto Kusu, two camphor trees joined by a sacred shimenawa rope — beloved as a symbol of marital bonds.">2本の楠を注連縄で結んだ「夫婦楠」。縁結びの象徴として親しまれる。</p>
   </div>
 
   <div class="photo-block landscape">
-    <img src="../assets/meiji-canopy.jpg" alt="明治神宮の杜の梢">
-    <p class="photo-block-caption">100年をかけて育った杜の梢。都心とは思えない木漏れ日が差し込む。</p>
+    <img src="../assets/meiji-canopy.jpg" alt="明治神宮の杜の梢" data-alt-en="The forest canopy of Meiji Jingu">
+    <p class="photo-block-caption" data-en="The canopy of a forest a century in the making, filtering light in a way that feels nothing like the city around it.">100年をかけて育った杜の梢。都心とは思えない木漏れ日が差し込む。</p>
   </div>
 
   <div class="section">
     <span class="section-label">Background</span>
-    <h2 class="section-title">文化的背景</h2>
-    <p>「都市の中の鎮守の森」という近代神社の代表例。祭神が近代の天皇であるという点で、古代から続く神々を祀る伊勢神宮などとは成り立ちが異なる、明治という時代そのものを象徴する神宮といえる。</p>
+    <h2 class="section-title" data-en="Cultural Background">文化的背景</h2>
+    <p data-en="Meiji Jingu is a defining example of a modern shrine as &quot;sacred forest within a city.&quot; Because it enshrines an emperor of the modern era, its origins differ from shrines like Ise Jingu, which honor deities from ancient myth — making it, in a sense, a jingu that embodies the Meiji era itself.">「都市の中の鎮守の森」という近代神社の代表例。祭神が近代の天皇であるという点で、古代から続く神々を祀る伊勢神宮などとは成り立ちが異なる、明治という時代そのものを象徴する神宮といえる。</p>
   </div>
 
   <div class="photo-block landscape">
-    <img src="../assets/meiji-barrels.jpg" alt="奉納された酒樽">
-    <p class="photo-block-caption">全国の蔵元から奉納された酒樽が参道脇に並ぶ、明治神宮ならではの光景。</p>
+    <img src="../assets/meiji-barrels.jpg" alt="奉納された酒樽" data-alt-en="Sake casks donated to the shrine">
+    <p class="photo-block-caption" data-en="Sake casks donated by breweries from across Japan, stacked along the approach — a sight unique to Meiji Jingu.">全国の蔵元から奉納された酒樽が参道脇に並ぶ、明治神宮ならではの光景。</p>
   </div>
 
 </div>
@@ -217,6 +230,32 @@
     });
   }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
   items.forEach(function(el){ io.observe(el); });
+})();
+
+// 言語切替（本人指定・2026-09-09）：地図と同じJA/EN切替をこのページにも導入。
+// data-en属性を持つ要素だけを対象に、初回切替時に元のテキスト（日本語）を
+// キャッシュしてから入れ替える。alt属性はdata-alt-enで別途対応。
+(function(){
+  function applyLang(lang){
+    document.querySelectorAll('[data-en]').forEach(function(el){
+      if (el.dataset.jaCache === undefined) el.dataset.jaCache = el.textContent;
+      el.textContent = lang === 'en' ? el.getAttribute('data-en') : el.dataset.jaCache;
+    });
+    document.querySelectorAll('img[data-alt-en]').forEach(function(el){
+      if (el.dataset.altJaCache === undefined) el.dataset.altJaCache = el.getAttribute('alt') || '';
+      el.setAttribute('alt', lang === 'en' ? el.getAttribute('data-alt-en') : el.dataset.altJaCache);
+    });
+    document.querySelectorAll('.lang-btn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+    });
+  }
+  var toggle = document.getElementById('lang-toggle');
+  if (toggle) {
+    toggle.addEventListener('click', function(e){
+      var btn = e.target.closest('.lang-btn');
+      if (btn) applyLang(btn.getAttribute('data-lang'));
+    });
+  }
 })();
 </script>
 </body>
