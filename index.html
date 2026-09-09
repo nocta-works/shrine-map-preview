@@ -253,32 +253,50 @@
     cursor: pointer; font-family: inherit;
   }
   .lang-btn.active { background: rgba(var(--gold-glow-rgb),0.22); border-color: var(--gold); color: var(--gold); }
-  /* 個別神社ページへの導線（本人指定・2026-09-08：本番地図の上部アイコン列と
-     同じ考え方で、地図の下に別枠を作らず地図の上に置く。地図はflex:1で
-     残りの縦幅をすべて使い、以前のように地図が窮屈にならないようにする） */
-  .shrine-select {
-    display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start;
-    padding: 12px 20px; border-bottom: 1px solid var(--border-4);
-  }
-  .shrine-select-item { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 52px; text-decoration: none; }
-  .shrine-select-badge {
-    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 15px; font-weight: bold; color: #fff;
-    transition: transform 0.2s ease;
-  }
-  .shrine-select-item:hover .shrine-select-badge { transform: scale(1.12); }
-  .shrine-select-label { font-size: 10px; color: var(--tan-text); letter-spacing: 0.03em; text-align: center; line-height: 1.3; }
-
-  /* タグフィルター行＋サイドバー（本人指定・2026-09-10：海外版は神宮・大社・一宮・二宮の
-     4タグに厳選。名社１は外国人旅行者向けに選定し直す方針のため今は含めない）。
-     見た目・構成は本番index.htmlの.controls-tags／#sidebarに合わせるが、
-     参拝記録・令制国絞り込み・達成状況モーダルはこの地図には持ち込まない
-     （地図全体を「情報を見るだけ」にとどめる既存の簡略化方針を踏襲） */
-  .mock-controls {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  /* 個別神社ページへの導線とタグフィルターを1段にまとめる（本人指定・2026-09-10：
+     タグは右端に並べる。個別神社紹介は横並びのアイコン列ではなく、縦の収納型
+     ――普段は閉じていてクリックで縦リストが開くドロップダウン――にする。
+     「理想の形はあるが伝えにくいので、一般的なものを一旦採用」とのことなので、
+     最も一般的なドロップダウンメニューの型を採用した */
+  .mock-toolbar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
     padding: 10px 20px; border-bottom: 1px solid var(--border-4);
+    position: relative;
   }
+  .shrine-dropdown { position: relative; flex-shrink: 0; }
+  .shrine-dropdown-toggle {
+    display: flex; align-items: center; gap: 7px;
+    padding: 7px 14px; border-radius: 20px; border: 1px solid var(--border-4);
+    background: rgba(0,0,0,0.22); color: var(--tan-text);
+    font-family: inherit; font-size: 13px; letter-spacing: 0.03em; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .shrine-dropdown-toggle:hover { border-color: var(--gold-muted); color: var(--gold-2); }
+  .shrine-dropdown.open .shrine-dropdown-toggle { border-color: var(--gold); color: var(--gold); background: rgba(var(--gold-glow-rgb),0.14); }
+  .shrine-dropdown-caret { font-size: 9px; opacity: 0.7; transition: transform 0.2s; }
+  .shrine-dropdown.open .shrine-dropdown-caret { transform: rotate(180deg); }
+  .shrine-dropdown-panel {
+    position: absolute; top: calc(100% + 8px); left: 0; z-index: 60;
+    min-width: 200px; padding: 6px;
+    background: linear-gradient(180deg, var(--bg-popup-1) 0%, var(--bg-popup-2) 100%);
+    border: 1px solid var(--border-header); border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    display: none;
+  }
+  .shrine-dropdown.open .shrine-dropdown-panel { display: block; }
+  .shrine-dropdown-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; text-decoration: none; }
+  .shrine-dropdown-item:hover { background: rgba(var(--gold-glow-rgb),0.10); }
+  .shrine-dropdown-badge {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 13px; font-weight: bold; color: #fff;
+  }
+  .shrine-dropdown-name { font-size: 13px; color: var(--tan-text); white-space: nowrap; }
+
+  /* タグフィルター（本人指定・2026-09-10：海外版は神宮・大社・一宮・二宮の4タグに厳選。
+     見た目・構成は本番index.htmlの.controls-tagsに合わせるが、参拝記録・令制国絞り込み・
+     達成状況モーダルはこの地図には持ち込まない） */
+  .mock-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
   .filter-btn {
     display: flex; align-items: center; gap: 5px;
     padding: 5px 11px; border-radius: 20px; border: 1.5px solid;
@@ -295,8 +313,18 @@
   .filter-btn.ni     { border-color: var(--tag-ni);     color: var(--tag-ni-light);     background: rgba(var(--tag-ni-rgb),0.12); }
   .filter-btn.ni.active     { background: rgba(var(--tag-ni-rgb),0.32);     box-shadow: 0 0 9px rgba(var(--tag-ni-rgb),0.4); }
   .filter-btn .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  /* 名社１のダミータグ（本人指定・2026-09-10：外国人旅行者向けの選定はまだ済んでいない
+     ため、今はタグの置き場所だけ確保する。破線＋低opacity＋クリック不可で
+     「準備中」であることを視覚的に示し、フィルターのクリック委譲（.filter-btn対象）
+     からも意図的に外している */
+  .filter-btn-dummy {
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 11px; border-radius: 20px; border: 1.5px dashed var(--tag-meisha);
+    font-family: inherit; font-size: 13px; letter-spacing: 0.05em;
+    color: var(--tag-meisha-light); opacity: 0.4; cursor: not-allowed; background: transparent;
+  }
   .ctrl-divider { width: 1px; height: 22px; background: var(--border-4); margin: 0 2px; flex-shrink: 0; }
-  .mock-stats { font-size: 12px; color: var(--tan-text-2); border-left: 1px solid var(--border-4); padding-left: 10px; white-space: nowrap; margin-left: auto; }
+  .mock-stats { font-size: 12px; color: var(--tan-text-2); border-left: 1px solid var(--border-4); padding-left: 10px; white-space: nowrap; }
 
   #map-area { flex: 1; display: flex; position: relative; overflow: hidden; min-height: 320px; }
   #shrine-map { flex: 1; min-width: 0; width: 100%; }
@@ -452,8 +480,15 @@
       <button type="button" class="lang-btn" data-lang="en">EN</button>
     </div>
   </div>
-  <div class="shrine-select" id="shrine-select"></div>
-  <div class="mock-controls" id="mock-controls"></div>
+  <div class="mock-toolbar">
+    <div class="shrine-dropdown" id="shrine-dropdown">
+      <button type="button" class="shrine-dropdown-toggle" id="shrine-dropdown-toggle">
+        <span id="shrine-dropdown-label"></span><span class="shrine-dropdown-caret">▾</span>
+      </button>
+      <div class="shrine-dropdown-panel" id="shrine-dropdown-panel"></div>
+    </div>
+    <div class="mock-controls" id="mock-controls"></div>
+  </div>
   <div id="map-area">
     <div id="shrine-map"></div>
     <div id="sidebar">
@@ -672,26 +707,38 @@
       '</div></div>';
   }
 
-  // 個別神社ページへの導線（本人指定・2026-09-08）：本番地図の上部アイコン列と
-  // 同じ「色付き丸バッジ＋1〜2文字」の見た目を流用。地図の下に別枠を作らず、
-  // 地図の上に置くことで地図の表示領域を圧迫しない。ページが増えたら
-  // この配列に追記するだけでよい。
+  // 個別神社ページへの導線（本人指定・2026-09-10：横並びのアイコン列ではなく、
+  // 普段は閉じていてクリックで開く縦の収納型ドロップダウンに変更。
+  // ページが増えたらこの配列に追記するだけでよい）
+  var DROPDOWN_LABEL = { ja: '個別紹介', en: 'Shrine Pages' };
   var SHRINE_PAGES = [
     { name:{ja:'伊勢神宮',en:'Ise Jingu'},   short:{ja:'伊',en:'I'}, tag:'jingu', file:'shrine-pages/伊勢神宮.html' },
     { name:{ja:'明治神宮',en:'Meiji Jingu'}, short:{ja:'明',en:'M'}, tag:'jingu', file:'shrine-pages/明治神宮.html' },
   ];
-  function renderShrineSelect(){
-    var container = document.getElementById('shrine-select');
-    if (!container) return;
-    container.innerHTML = SHRINE_PAGES.map(function(s){
+  function renderShrineDropdown(){
+    var label = document.getElementById('shrine-dropdown-label');
+    if (label) label.textContent = '⛩ ' + DROPDOWN_LABEL[currentLang];
+    var panel = document.getElementById('shrine-dropdown-panel');
+    if (!panel) return;
+    panel.innerHTML = SHRINE_PAGES.map(function(s){
       var c = TAG_CONFIG[s.tag];
-      return '<a class="shrine-select-item" href="' + s.file + '">' +
-        '<span class="shrine-select-badge" style="background:' + c.color + ';border:1.5px solid ' + c.border + ';">' + s.short[currentLang] + '</span>' +
-        '<span class="shrine-select-label">' + s.name[currentLang] + '</span>' +
+      return '<a class="shrine-dropdown-item" href="' + s.file + '">' +
+        '<span class="shrine-dropdown-badge" style="background:' + c.color + ';border:1.5px solid ' + c.border + ';">' + s.short[currentLang] + '</span>' +
+        '<span class="shrine-dropdown-name">' + s.name[currentLang] + '</span>' +
         '</a>';
     }).join('');
   }
-  renderShrineSelect();
+  renderShrineDropdown();
+  var shrineDropdown = document.getElementById('shrine-dropdown');
+  document.getElementById('shrine-dropdown-toggle').addEventListener('click', function(e){
+    e.stopPropagation();
+    shrineDropdown.classList.toggle('open');
+  });
+  document.addEventListener('click', function(e){
+    if (shrineDropdown.classList.contains('open') && !shrineDropdown.contains(e.target)) {
+      shrineDropdown.classList.remove('open');
+    }
+  });
 
   // タグフィルター（本人指定・2026-09-10：神宮・大社・一宮・二宮の4タグのみ。
   // 本番と違い候補タグがこの4つで全部なので「その他のタグ」展開パネルは作らない）
@@ -715,7 +762,14 @@
         '<span class="dot" style="background:' + c.border + ';box-shadow:0 0 5px ' + c.border + '"></span>' +
         c.label[currentLang] + '</button>';
     }).join('');
-    container.innerHTML = buttonsHtml + '<div class="ctrl-divider"></div><div class="mock-stats" id="mock-stats"></div>';
+    // 名社１のダミータグ（本人指定・2026-09-10）：外国人旅行者向けの選定がまだのため、
+    // 実データ・クリック機能なしで置き場所だけ確保する
+    var dummyCfg = TAG_CONFIG.meisha;
+    var dummyTitle = currentLang === 'ja' ? '選定中（外国人旅行者向けに準備中）' : 'Coming soon (curation in progress)';
+    var dummyHtml = '<button type="button" class="filter-btn-dummy" disabled title="' + dummyTitle + '">' +
+      '<span class="dot" style="background:' + dummyCfg.border + ';box-shadow:0 0 5px ' + dummyCfg.border + '"></span>' +
+      dummyCfg.label[currentLang] + '</button>';
+    container.innerHTML = buttonsHtml + dummyHtml + '<div class="ctrl-divider"></div><div class="mock-stats" id="mock-stats"></div>';
   }
   renderFilterButtons();
   document.getElementById('mock-controls').addEventListener('click', function(e){
@@ -737,10 +791,15 @@
   function buildShrineItem(shrine, dotColor) {
     var item = document.createElement('div');
     item.className = 'shrine-item';
+    // サイドバー一覧の英語対応（本人指定・2026-09-10）：社名・都道府県名を
+    // shrines-overseas.jsonのnameEn/prefEnに差し替える。祭神・由緒などの
+    // 個別社データは従来どおり翻訳対象外（ポップアップは日本語のまま）
+    var name = currentLang === 'en' ? shrine.nameEn : shrine.name;
+    var pref = currentLang === 'en' ? shrine.prefEn : shrine.pref;
     item.innerHTML =
       '<div class="shrine-item-dot" style="background:' + dotColor + ';box-shadow:0 0 5px ' + dotColor + '80;"></div>' +
-      '<div class="shrine-item-name">' + shrine.name + '</div>' +
-      '<div class="shrine-item-pref">' + shrine.pref + '</div>';
+      '<div class="shrine-item-name">' + name + '</div>' +
+      '<div class="shrine-item-pref">' + pref + '</div>';
     item.addEventListener('click', function(){ focusShrine(shrine); });
     return item;
   }
@@ -824,7 +883,7 @@
       b.classList.toggle('active', b.getAttribute('data-lang') === lang);
     });
     document.getElementById('mock-title').textContent = HEADER_TITLE[lang];
-    renderShrineSelect();
+    renderShrineDropdown();
     renderFilterButtons();
     updateStats();
     renderSidebarList();
