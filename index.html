@@ -230,7 +230,11 @@
   }
 
   /* ── ここから下は「本体（地図・メニュー画面）」。地図本体は本番index.htmlの実装を流用 ── */
-  .mock-app { min-height: 100vh; display: flex; flex-direction: column; scroll-snap-align: start; }
+  /* サイドバー実装時に発覚：min-height:100vhのままだと配下の#map-areaがflex:1でも
+     「残りの縦幅を使う」動作にならず、サイドバーのリスト項目（152件の実コンテンツ）
+     がそのまま縦に伸び、地図・サイドバー全体が4700px超まで引き伸ばされてしまう。
+     heightを確定値にして初めてflex:1とoverflow-y:autoが機能する */
+  .mock-app { height: 100vh; display: flex; flex-direction: column; scroll-snap-align: start; }
   .mock-header {
     padding: 16px 20px; border-bottom: 1px solid var(--border-4);
     display: flex; align-items: center; gap: 10px;
@@ -265,7 +269,90 @@
   }
   .shrine-select-item:hover .shrine-select-badge { transform: scale(1.12); }
   .shrine-select-label { font-size: 10px; color: var(--tan-text); letter-spacing: 0.03em; text-align: center; line-height: 1.3; }
-  #shrine-map { flex: 1; min-height: 320px; width: 100%; }
+
+  /* タグフィルター行＋サイドバー（本人指定・2026-09-10：海外版は神宮・大社・一宮・二宮の
+     4タグに厳選。名社１は外国人旅行者向けに選定し直す方針のため今は含めない）。
+     見た目・構成は本番index.htmlの.controls-tags／#sidebarに合わせるが、
+     参拝記録・令制国絞り込み・達成状況モーダルはこの地図には持ち込まない
+     （地図全体を「情報を見るだけ」にとどめる既存の簡略化方針を踏襲） */
+  .mock-controls {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+    padding: 10px 20px; border-bottom: 1px solid var(--border-4);
+  }
+  .filter-btn {
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 11px; border-radius: 20px; border: 1.5px solid;
+    cursor: pointer; font-family: inherit; font-size: 13px; letter-spacing: 0.05em;
+    transition: all 0.25s; opacity: 0.42; background: transparent;
+  }
+  .filter-btn.active { opacity: 1; }
+  .filter-btn.jingu  { border-color: var(--tag-jingu);  color: var(--tag-jingu-light);  background: rgba(var(--tag-jingu-rgb),0.12); }
+  .filter-btn.jingu.active  { background: rgba(var(--tag-jingu-rgb),0.38);  box-shadow: 0 0 9px rgba(var(--tag-jingu-rgb),0.4); }
+  .filter-btn.taisha { border-color: var(--tag-taisha); color: var(--tag-taisha-light); background: rgba(var(--tag-taisha-rgb),0.12); }
+  .filter-btn.taisha.active { background: rgba(var(--tag-taisha-rgb),0.32); box-shadow: 0 0 9px rgba(var(--tag-taisha-rgb),0.4); }
+  .filter-btn.ichi   { border-color: var(--tag-ichi);   color: var(--tag-ichi-light);   background: rgba(var(--tag-ichi-rgb),0.12); }
+  .filter-btn.ichi.active   { background: rgba(var(--tag-ichi-rgb),0.36);   box-shadow: 0 0 9px rgba(var(--tag-ichi-rgb),0.4); }
+  .filter-btn.ni     { border-color: var(--tag-ni);     color: var(--tag-ni-light);     background: rgba(var(--tag-ni-rgb),0.12); }
+  .filter-btn.ni.active     { background: rgba(var(--tag-ni-rgb),0.32);     box-shadow: 0 0 9px rgba(var(--tag-ni-rgb),0.4); }
+  .filter-btn .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .ctrl-divider { width: 1px; height: 22px; background: var(--border-4); margin: 0 2px; flex-shrink: 0; }
+  .mock-stats { font-size: 12px; color: var(--tan-text-2); border-left: 1px solid var(--border-4); padding-left: 10px; white-space: nowrap; margin-left: auto; }
+
+  #map-area { flex: 1; display: flex; position: relative; overflow: hidden; min-height: 320px; }
+  #shrine-map { flex: 1; min-width: 0; width: 100%; }
+  #sidebar {
+    width: 220px; flex-shrink: 0;
+    background: linear-gradient(180deg, var(--bg-popup-1) 0%, var(--bg-popup-2) 100%);
+    border-left: 1px solid var(--border-header);
+    display: flex; flex-direction: column;
+  }
+  .sidebar-top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 12px; border-bottom: 1px solid var(--border-header);
+    background: rgba(44,24,16,0.6); flex-shrink: 0;
+  }
+  .sidebar-title { font-size: 12px; letter-spacing: 0.08em; color: var(--tan-text); }
+  .sidebar-count { font-size: 11px; color: var(--gold-muted); }
+  #sidebar-list {
+    flex: 1; overflow-y: auto;
+    scrollbar-width: thin; scrollbar-color: var(--border-header) transparent;
+  }
+  .sidebar-section-title {
+    position: sticky; top: 0; z-index: 10;
+    padding: 6px 12px 6px 10px; font-size: 12px; font-weight: 700; letter-spacing: 0.05em;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .sidebar-section-count { font-size: 10.5px; font-weight: 400; opacity: 0.65; }
+  .shrine-item {
+    display: flex; align-items: center; gap: 8px; padding: 6px 12px;
+    cursor: pointer; border-bottom: 1px solid rgba(58,30,8,0.4);
+    transition: background 0.12s;
+  }
+  .shrine-item:hover { background: rgba(var(--gold-glow-rgb),0.08); }
+  .shrine-item-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .shrine-item-name {
+    font-size: 11.5px; color: var(--tan-text); flex: 1; min-width: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .shrine-item-pref { font-size: 10px; color: var(--gold-muted); flex-shrink: 0; }
+
+  /* マーカーの出現/消滅アニメーション（本番index.htmlの実装をそのまま移植・2026-09-09の
+     修正込み）。クリーンアップをanimationendに頼らずsetTimeoutで確実に行う理由は
+     本番側コメント参照：animation-fill-mode(both)がLeafletの位置決めtransformを
+     恒久的に上書きしたまま残ると、以後の地図移動でマーカーが取り残される */
+  @keyframes markerPopIn {
+    from { opacity: 0; transform: scale(0.4); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .marker-pop-in { animation: markerPopIn 0.25s cubic-bezier(0.34,1.56,0.64,1) both; transform-origin: 50% 95%; }
+  .marker-pop-out { animation: markerPopIn 0.12s ease-in reverse both; transform-origin: 50% 95%; }
+
+  /* 狭幅では引き出し式サイドバー等は作り込まず、まず地図の表示領域を優先する
+     （本番のボトムシート化まではこの試作の現段階ではスコープ外） */
+  @media (max-width: 640px) {
+    #sidebar { display: none; }
+  }
   /* タイルのみ暗色反転（マーカー・ポップアップには影響しない。本番index.htmlと同一処理） */
   .leaflet-tile-pane {
     filter: invert(0.91) hue-rotate(180deg) contrast(0.80) brightness(0.88) saturate(0.60);
@@ -366,7 +453,17 @@
     </div>
   </div>
   <div class="shrine-select" id="shrine-select"></div>
-  <div id="shrine-map"></div>
+  <div class="mock-controls" id="mock-controls"></div>
+  <div id="map-area">
+    <div id="shrine-map"></div>
+    <div id="sidebar">
+      <div class="sidebar-top">
+        <span class="sidebar-title" id="sidebar-title"></span>
+        <span class="sidebar-count" id="sidebar-count"></span>
+      </div>
+      <div id="sidebar-list"></div>
+    </div>
+  </div>
 </div>
 
 <button id="replay-btn" onclick="sessionStorage.removeItem('introShown'); location.reload();">🔄 演出をやり直す</button>
@@ -508,15 +605,28 @@
   var currentLang = 'ja';
   var HEADER_TITLE = { ja: '社巡り道標（海外版・仮）', en: 'Shrine Guide (Overseas Ver. — Draft)' };
   var CHROME_TEXT = {
-    ja: { province: '旧国：', deity: '祭神：', map: '地図', official: '公式', wiki: 'Wiki' },
-    en: { province: 'Province: ', deity: 'Deity: ', map: 'Map', official: 'Official', wiki: 'Wiki' },
+    ja: {
+      province: '旧国：', deity: '祭神：', map: '地図', official: '公式', wiki: 'Wiki',
+      listTitle: '神社リスト',
+      shownFmt: function(n){ return '表示中 ' + n + ' 社'; },
+      countFmt: function(n){ return n + '社'; },
+    },
+    en: {
+      province: 'Province: ', deity: 'Deity: ', map: 'Map', official: 'Official', wiki: 'Wiki',
+      listTitle: 'Shrine List',
+      shownFmt: function(n){ return 'Showing ' + n + ' shrine' + (n === 1 ? '' : 's'); },
+      countFmt: function(n){ return n + ' shrine' + (n === 1 ? '' : 's'); },
+    },
   };
   var PRIORITY = { jingu:10, taisha:9, ichi:8, ni:7, meisha:6, meisha2:5, hachiman:4, inari:3, meisha3:2 };
+  // 海外版で実際に絞り込み対象にするタグ（本人指定・2026-09-10）。名社１は
+  // 外国人旅行者向けに選定し直す方針のため、選定が済むまではここに含めない
+  var TAG_ORDER = ['jingu', 'taisha', 'ichi', 'ni'];
   var TAG_CONFIG = {
-    jingu:   { label:{ja:'神宮',en:'Jingu'},        char:{ja:'神',en:'J'},  color:'#c47a08', border:'#f5c842' },
-    taisha:  { label:{ja:'大社',en:'Taisha'},       char:{ja:'大',en:'T'},  color:'#6d28d9', border:'#c4a8ff' },
-    ichi:    { label:{ja:'一宮',en:'Ichinomiya (1st)'}, char:{ja:'一',en:'1'}, color:'#c41810', border:'#ff9a8a' },
-    ni:      { label:{ja:'二宮',en:'Ninomiya (2nd)'},   char:{ja:'二',en:'2'}, color:'#1540c0', border:'#88b4ff' },
+    jingu:   { label:{ja:'神宮',en:'Jingu'},        char:{ja:'神',en:'J'},  color:'#c47a08', border:'#f5c842', bg:'rgba(212,134,10,0.18)' },
+    taisha:  { label:{ja:'大社',en:'Taisha'},       char:{ja:'大',en:'T'},  color:'#6d28d9', border:'#c4a8ff', bg:'rgba(124,58,237,0.18)' },
+    ichi:    { label:{ja:'一宮',en:'Ichinomiya (1st)'}, char:{ja:'一',en:'1'}, color:'#c41810', border:'#ff9a8a', bg:'rgba(232,48,32,0.18)' },
+    ni:      { label:{ja:'二宮',en:'Ninomiya (2nd)'},   char:{ja:'二',en:'2'}, color:'#1540c0', border:'#88b4ff', bg:'rgba(26,80,216,0.18)' },
     meisha:  { label:{ja:'名社１',en:'Notable α'}, char:{ja:'名',en:'α'}, color:'#047857', border:'#6ee7b7' },
     meisha2: { label:{ja:'名社２',en:'Notable β'}, char:{ja:'社',en:'β'}, color:'#0369a1', border:'#7dd3fc' },
     meisha3: { label:{ja:'名社３',en:'Notable γ'}, char:{ja:'奉',en:'γ'}, color:'#92400e', border:'#fcd34d' },
@@ -583,7 +693,131 @@
   }
   renderShrineSelect();
 
+  // タグフィルター（本人指定・2026-09-10：神宮・大社・一宮・二宮の4タグのみ。
+  // 本番と違い候補タグがこの4つで全部なので「その他のタグ」展開パネルは作らない）
+  var activeFilters = new Set(TAG_ORDER);
+  function passesFilter(shrine) {
+    return shrine.tags.some(function(t){ return activeFilters.has(t); });
+  }
+  // サイドバーでの振り分け先：有効フィルタの中で最優先のタグ
+  function displayTag(shrine) {
+    var tags = shrine.tags.filter(function(t){ return activeFilters.has(t); });
+    if (!tags.length) return null;
+    return tags.reduce(function(b,t){ return PRIORITY[t] > PRIORITY[b] ? t : b; }, tags[0]);
+  }
+  function renderFilterButtons() {
+    var container = document.getElementById('mock-controls');
+    if (!container) return;
+    var buttonsHtml = TAG_ORDER.map(function(tag){
+      var c = TAG_CONFIG[tag];
+      var active = activeFilters.has(tag) ? ' active' : '';
+      return '<button type="button" class="filter-btn ' + tag + active + '" data-tag="' + tag + '">' +
+        '<span class="dot" style="background:' + c.border + ';box-shadow:0 0 5px ' + c.border + '"></span>' +
+        c.label[currentLang] + '</button>';
+    }).join('');
+    container.innerHTML = buttonsHtml + '<div class="ctrl-divider"></div><div class="mock-stats" id="mock-stats"></div>';
+  }
+  renderFilterButtons();
+  document.getElementById('mock-controls').addEventListener('click', function(e){
+    var btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    var tag = btn.getAttribute('data-tag');
+    activeFilters.has(tag) ? activeFilters.delete(tag) : activeFilters.add(tag);
+    btn.classList.toggle('active', activeFilters.has(tag));
+    redrawMarkers();
+  });
+
+  function updateStats() {
+    var el = document.getElementById('mock-stats');
+    if (!el) return;
+    var n = markerList.filter(function(item){ return passesFilter(item.shrine); }).length;
+    el.textContent = CHROME_TEXT[currentLang].shownFmt(n);
+  }
+
+  function buildShrineItem(shrine, dotColor) {
+    var item = document.createElement('div');
+    item.className = 'shrine-item';
+    item.innerHTML =
+      '<div class="shrine-item-dot" style="background:' + dotColor + ';box-shadow:0 0 5px ' + dotColor + '80;"></div>' +
+      '<div class="shrine-item-name">' + shrine.name + '</div>' +
+      '<div class="shrine-item-pref">' + shrine.pref + '</div>';
+    item.addEventListener('click', function(){ focusShrine(shrine); });
+    return item;
+  }
+
+  function renderSidebarList() {
+    var list = document.getElementById('sidebar-list');
+    if (!list) return;
+    list.innerHTML = '';
+    var total = 0;
+    TAG_ORDER.forEach(function(tag){
+      if (!activeFilters.has(tag)) return;
+      var items = markerList.filter(function(item){ return displayTag(item.shrine) === tag; });
+      if (!items.length) return;
+      var cfg = TAG_CONFIG[tag];
+      var sec = document.createElement('div');
+      sec.className = 'sidebar-section';
+      var title = document.createElement('div');
+      title.className = 'sidebar-section-title';
+      title.style.cssText = 'background:' + cfg.bg + '; border-left:3px solid ' + cfg.border + '; color:' + cfg.border + ';';
+      title.innerHTML = '<span>' + cfg.label[currentLang] + '</span><span class="sidebar-section-count">' + CHROME_TEXT[currentLang].countFmt(items.length) + '</span>';
+      sec.appendChild(title);
+      items.forEach(function(item){ sec.appendChild(buildShrineItem(item.shrine, cfg.color)); });
+      list.appendChild(sec);
+      total += items.length;
+    });
+    var countEl = document.getElementById('sidebar-count');
+    if (countEl) countEl.textContent = CHROME_TEXT[currentLang].countFmt(total);
+    var titleEl = document.getElementById('sidebar-title');
+    if (titleEl) titleEl.textContent = CHROME_TEXT[currentLang].listTitle;
+  }
+
+  function focusShrine(shrine) {
+    var entry = markerList.filter(function(item){ return item.shrine === shrine; })[0];
+    if (!entry) return;
+    if (!map.hasLayer(entry.marker)) entry.marker.addTo(map);
+    map.flyTo([shrine.lat, shrine.lng], Math.max(map.getZoom(), 9), { duration: 0.7 });
+    setTimeout(function(){ entry.marker.openPopup(); }, 650);
+  }
+
+  // マーカーの出現/消滅アニメーション再生。本番index.htmlの2026-09-09の修正
+  // （animationendに頼らずsetTimeoutで確実にクラスを外す）をそのまま踏襲する
+  function playMarkerAnim(icon, addClass, removeClass, totalMs) {
+    icon.classList.remove(removeClass);
+    icon.classList.add(addClass);
+    setTimeout(function(){ icon.classList.remove(addClass); }, totalMs);
+  }
+
+  function redrawMarkers() {
+    markerList.forEach(function(item){
+      var show = passesFilter(item.shrine);
+      var onMap = map.hasLayer(item.marker);
+      if (show && item._removeTimer) {
+        clearTimeout(item._removeTimer);
+        item._removeTimer = null;
+        var stayIcon = item.marker._icon;
+        if (stayIcon) stayIcon.classList.remove('marker-pop-out');
+        return;
+      }
+      if (show && !onMap) {
+        item.marker.addTo(map);
+        var inIcon = item.marker._icon;
+        if (inIcon) playMarkerAnim(inIcon, 'marker-pop-in', 'marker-pop-out', 250);
+      } else if (!show && onMap && !item._removeTimer) {
+        var outIcon = item.marker._icon;
+        if (outIcon) playMarkerAnim(outIcon, 'marker-pop-out', 'marker-pop-in', 150);
+        item._removeTimer = setTimeout(function(){
+          item._removeTimer = null;
+          if (map.hasLayer(item.marker) && !passesFilter(item.shrine)) map.removeLayer(item.marker);
+        }, 130);
+      }
+    });
+    updateStats();
+    renderSidebarList();
+  }
+
   var markerList = [];
+  var map; // fetch内で代入。redrawMarkers/focusShrineから参照するため外側スコープで宣言
   function applyLang(lang) {
     currentLang = lang;
     document.querySelectorAll('.lang-btn').forEach(function(b){
@@ -591,6 +825,9 @@
     });
     document.getElementById('mock-title').textContent = HEADER_TITLE[lang];
     renderShrineSelect();
+    renderFilterButtons();
+    updateStats();
+    renderSidebarList();
     markerList.forEach(function(item){
       item.marker.setIcon(getIcon(topTag(item.shrine.tags)));
       if (item.marker.getPopup()) item.marker.getPopup().setContent(buildPopupContent(item.shrine));
@@ -604,7 +841,7 @@
     });
   }
 
-  fetch('assets/shrines-jingu-taisha.json')
+  fetch('assets/shrines-overseas.json')
     .then(function(res){ return res.json(); })
     .then(function(shrines){
       // scrollWheelZoom:false で開始し、ページスクロールで地図の上を通過した
@@ -612,7 +849,7 @@
       // 触りたいという本人要望があるため、地図上でのスクロールがいったん
       // 止まった時点（＝勢いで通過し終えたと判断できる時点）で自動的に
       // scrollWheelZoomを有効化する（本人指摘・2026-09-08）。
-      var map = L.map('shrine-map', { center: [36.0,136.5], zoom: 5, scrollWheelZoom: false });
+      map = L.map('shrine-map', { center: [36.0,136.5], zoom: 5, scrollWheelZoom: false });
       (function(){
         var mapEl = document.getElementById('shrine-map');
         var armTimer = null;
@@ -633,11 +870,13 @@
       var bounds = [];
       shrines.forEach(function(s){
         var marker = L.marker([s.lat, s.lng], { icon: getIcon(topTag(s.tags)) })
-          .bindPopup(buildPopupContent(s), { className: 'shrine-popup' })
-          .addTo(map);
+          .bindPopup(buildPopupContent(s), { className: 'shrine-popup' });
+        if (passesFilter(s)) marker.addTo(map);
         markerList.push({ marker: marker, shrine: s });
         bounds.push([s.lat, s.lng]);
       });
+      updateStats();
+      renderSidebarList();
       function fitWhenReady(attempts) {
         attempts = attempts || 0;
         map.invalidateSize();
