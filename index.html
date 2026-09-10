@@ -463,18 +463,7 @@
 
 <div class="fixed-caption" id="fixed-caption">その一つ一つに、実際に足を運んだ。</div>
 
-<section class="scroll-slide reveal-slide">
-  <img src="assets/katori-backlit.jpg" alt="香取神宮">
-  <div class="scroll-slide-hint"><span class="scroll-slide-hint-arrow">⌄</span>SCROLL</div>
-</section>
-<section class="scroll-slide reveal-slide">
-  <img src="assets/kashima-hall.jpg" alt="鹿島神宮">
-  <div class="scroll-slide-hint"><span class="scroll-slide-hint-arrow">⌄</span>SCROLL</div>
-</section>
-<section class="scroll-slide reveal-slide" id="last-scroll-slide">
-  <img src="assets/samukawa-sakura.jpg" alt="寒川神社">
-  <div class="scroll-slide-hint"><span class="scroll-slide-hint-arrow">⌄</span>SCROLL</div>
-</section>
+<div id="scroll-slides"></div>
 
 <div class="mock-app" id="mock-app">
   <div class="mock-header">
@@ -617,7 +606,10 @@
 })();
 
 // ④スクロール連動のズームアウト：画面に入った写真だけ.revealedを付与
-(function(){
+// （本人指定・2026-09-10：候補写真が増えたため、固定3枚ではなくマニフェストから
+// 毎回ランダムに3枚選んで表示する。スライドをJSで動的に生成するため、
+// このIntersectionObserver設定は挿入後に呼べるよう関数化してある）
+function initScrollSlideReveal() {
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var items = document.querySelectorAll('.reveal-slide');
   if (reduced || !('IntersectionObserver' in window)) {
@@ -633,6 +625,44 @@
     });
   }, { threshold: 0.4 });
   items.forEach(function(el){ io.observe(el); });
+}
+
+(function(){
+  var FALLBACK = [
+    { file: 'assets/katori-backlit.jpg', alt: '香取神宮' },
+    { file: 'assets/kashima-hall.jpg', alt: '鹿島神宮' },
+    { file: 'assets/samukawa-sakura.jpg', alt: '寒川神社' },
+  ];
+  var SLIDE_COUNT = 3;
+
+  function pickRandom(list, n) {
+    var pool = list.slice();
+    var picked = [];
+    while (picked.length < n && pool.length) {
+      var idx = Math.floor(Math.random() * pool.length);
+      picked.push(pool.splice(idx, 1)[0]);
+    }
+    return picked;
+  }
+
+  function renderSlides(list) {
+    var container = document.getElementById('scroll-slides');
+    if (!container) return;
+    var picked = pickRandom(list, SLIDE_COUNT);
+    container.innerHTML = picked.map(function(item, i){
+      var idAttr = i === picked.length - 1 ? ' id="last-scroll-slide"' : '';
+      return '<section class="scroll-slide reveal-slide"' + idAttr + '>' +
+        '<img src="' + item.file + '" alt="' + (item.alt || '') + '">' +
+        '<div class="scroll-slide-hint"><span class="scroll-slide-hint-arrow">⌄</span>SCROLL</div>' +
+        '</section>';
+    }).join('');
+    initScrollSlideReveal();
+  }
+
+  fetch('assets/zoomout-manifest.json')
+    .then(function(res){ return res.json(); })
+    .then(function(list){ renderSlides(list && list.length ? list : FALLBACK); })
+    .catch(function(){ renderSlides(FALLBACK); });
 })();
 
 // ⑤本体：神宮・大社タグの神社のみ（48社）を表示する簡易地図
