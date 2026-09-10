@@ -276,7 +276,12 @@
   .shrine-dropdown-caret { font-size: 9px; opacity: 0.7; transition: transform 0.2s; }
   .shrine-dropdown.open .shrine-dropdown-caret { transform: rotate(180deg); }
   .shrine-dropdown-panel {
-    position: absolute; top: calc(100% + 8px); left: 0; z-index: 60;
+    /* z-indexはLeafletの内部ペイン（ズームコントロール1000・ポップアップペイン700等）より
+       確実に上に来る値にする。#map-area・#shrine-mapのどちらもposition:relativeのみで
+       z-indexを持たず独自の重なりコンテキストを作らないため、Leafletの内部要素の
+       z-indexがそのままこのドロップダウンパネルと直接競合し、低い値だと地図の下に
+       埋もれてしまう（本人指摘・2026-09-10で発覚） */
+    position: absolute; top: calc(100% + 8px); left: 0; z-index: 2000;
     min-width: 200px; padding: 6px;
     background: linear-gradient(180deg, var(--bg-popup-1) 0%, var(--bg-popup-2) 100%);
     border: 1px solid var(--border-header); border-radius: 10px;
