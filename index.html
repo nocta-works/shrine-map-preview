@@ -91,8 +91,7 @@
   }
   @keyframes introFadeIn { to { opacity: 1; } }
 
-  .intro-hero { position: absolute; inset: 0; z-index: 1; opacity: 1; transition: opacity 1s ease; }
-  .intro-hero.intro-hero-fade { opacity: 0; }
+  .intro-hero { position: absolute; inset: 0; z-index: 1; opacity: 1; }
   .intro-hero-media {
     position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
     background: radial-gradient(ellipse at center, var(--bg-header-1), var(--bg-body) 70%);
@@ -110,12 +109,15 @@
   }
   .intro-shrine-name.intro-shrine-name-show::after { opacity: 0.55; }
 
-  .intro-video { position: absolute; inset: 0; z-index: 1; opacity: 0; transition: opacity 1s ease; }
-  .intro-video.intro-video-show { opacity: 1; }
+  /* ③動画（本人指定・2026-09-11：④の写真3枚と同じくスクロール対象の
+     .scroll-slideとして表示。ズームアウト演出（scale 1.18→1）も写真と揃える） */
   .intro-video-media {
     position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
     background: var(--bg-header-1);
+    transform: scale(1.18);
+    transition: transform 5.5s cubic-bezier(0.16,0.6,0.3,1);
   }
+  .scroll-slide.revealed .intro-video-media { transform: scale(1); }
   .intro-video-label {
     position: absolute; left: 14px; bottom: 14px; z-index: 1;
     font-size: 10px; letter-spacing: 0.06em; color: rgba(221,208,160,0.55);
@@ -437,15 +439,8 @@
     <img class="intro-hero-media" alt="">
     <div class="intro-shrine-name" id="intro-shrine-name"></div>
   </div>
-  <div class="intro-video">
-    <video class="intro-video-media" autoplay muted loop playsinline>
-      <source src="assets/samukawa-sample.mp4" type="video/mp4">
-    </video>
-    <div class="intro-video-label">🎥 仮素材（寒川神社・未編集からの簡易書き出し）</div>
-  </div>
   <div class="intro-overlay"></div>
   <div class="intro-tagline">分けて探して、次の一社へ</div>
-  <div class="intro-video-caption" id="intro-video-caption">格式も、系統も、ご利益も。<br>切り口を変えるたびに、知らなかった一社に出会う。</div>
   <div class="intro-gate intro-gate-left"></div>
   <div class="intro-gate intro-gate-right"></div>
   <div class="intro-loader">
@@ -460,6 +455,17 @@
     <div class="intro-percent" id="intro-percent">0</div>
   </div>
 </div>
+
+<!-- ③動画（本人指定・2026-09-11：タイマーで自動送りせず、④の写真3枚と同じ
+     スクロール対象にする。#introを抜けた直後、最初にスクロールで辿り着く枠） -->
+<section class="scroll-slide reveal-slide" id="video-slide">
+  <video class="intro-video-media" autoplay muted loop playsinline>
+    <source src="assets/samukawa-sample.mp4" type="video/mp4">
+  </video>
+  <div class="intro-video-label">🎥 仮素材（寒川神社・未編集からの簡易書き出し）</div>
+  <div class="intro-video-caption" id="intro-video-caption">格式も、系統も、ご利益も。<br>切り口を変えるたびに、知らなかった一社に出会う。</div>
+  <div class="scroll-slide-hint"><span class="scroll-slide-hint-arrow">⌄</span>SCROLL</div>
+</section>
 
 <div class="fixed-caption" id="fixed-caption">その一つ一つに、実際に足を運んだ。</div>
 
@@ -540,8 +546,6 @@
   sessionStorage.setItem('introShown', '1');
 
   var loader = intro.querySelector('.intro-loader');
-  var hero = intro.querySelector('.intro-hero');
-  var video = intro.querySelector('.intro-video');
   var tagline = intro.querySelector('.intro-tagline');
   var videoCaption = document.getElementById('intro-video-caption');
   var gateLeft = intro.querySelector('.intro-gate-left');
@@ -550,9 +554,8 @@
   var finished = false;
 
   var taglineCharCount = wrapCharsReveal(tagline, CHAR_STEP);
-  var videoCaptionCharCount = wrapCharsReveal(videoCaption, CHAR_STEP);
+  wrapCharsReveal(videoCaption, CHAR_STEP); // ③動画のキャプションは後段でスクロール到達時に表示（下部の別IIFE参照）
   var taglineHoldMs = Math.max(5000, (taglineCharCount - 1) * CHAR_STEP + CHAR_FADE + READ_BUFFER);
-  var videoHoldMs = Math.max(3000, (videoCaptionCharCount - 1) * CHAR_STEP + CHAR_FADE + READ_BUFFER);
 
   var RING_MS = 1400;
   var start = performance.now();
@@ -563,13 +566,11 @@
   }
   requestAnimationFrame(tickPercent);
 
-  var fixedCaption = document.getElementById('fixed-caption');
   function finish() {
     if (finished) return;
     finished = true;
     intro.classList.add('intro-hide');
     setTimeout(function(){ intro.style.display = 'none'; }, 650);
-    fixedCaption.classList.add('fixed-caption-show'); // ④スクロール領域に入ったら固定表示を開始
   }
   function openGates() {
     loader.classList.add('intro-loader-hide');
@@ -578,31 +579,52 @@
     tagline.classList.add('intro-tagline-show');
     document.getElementById('intro-shrine-name').classList.add('intro-shrine-name-show');
   }
-  function showVideo() {
-    hero.classList.add('intro-hero-fade');
-    video.classList.add('intro-video-show');
-    tagline.classList.remove('intro-tagline-show');
-    videoCaption.classList.add('intro-video-caption-show');
-  }
   intro.addEventListener('click', finish);
-  setTimeout(openGates, 1500);                    // ①ロード(1.4s)完了→gateが開く
-  setTimeout(showVideo, 1500 + taglineHoldMs);     // ②鳥居の静止画＋文字が読み終わるまで見せる→③動画へ
-  // ③→④：自動送り版と違い、ここでは動画の後すぐ#introを閉じてスクロール領域へ渡す
-  // （タイマーで写真を送るのではなく、本人が実際にスクロールして3枚を見る方式のため）
-  setTimeout(finish, 1500 + taglineHoldMs + videoHoldMs); // ③動画＋文字が読み終わるまで見せる→④（スクロール領域）へ
+  setTimeout(openGates, 1500);                // ①ロード(1.4s)完了→gateが開く
+  // ②→③：本人指定・2026-09-11：③動画をタイマーの自動送りから外し、④の写真3枚と
+  // 同じスクロール対象にした。そのため②の文字が読み終わったら即#introを閉じ、
+  // 後は本人が実際にスクロールして③動画→④写真3枚と辿る方式にしている
+  setTimeout(finish, 1500 + taglineHoldMs);
 })();
 
-// ④の固定キャプションは、本体（mock-app）に入ったら消す
+// ③動画のキャプションは、動画のスクロール枠が画面に入ったタイミングで表示する
+// （本人指定・2026-09-11：タイマー表示をやめ、④の写真と同じスクロール駆動に統一）
+(function(){
+  var videoSlide = document.getElementById('video-slide');
+  var videoCaption = document.getElementById('intro-video-caption');
+  if (!videoSlide || !videoCaption) return;
+  if (!('IntersectionObserver' in window)) {
+    videoCaption.classList.add('intro-video-caption-show');
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting) {
+        videoCaption.classList.add('intro-video-caption-show');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.4 });
+  io.observe(videoSlide);
+})();
+
+// ④の固定キャプションは、写真スクロール領域（#scroll-slides）が画面に入っている
+// 間だけ表示する（本人指定・2026-09-11：③動画をスクロール対象化したのに伴い、
+// 表示開始のトリガーを「#introが閉じた瞬間」から「実際に写真の枠までスクロール
+// してきた瞬間」に変更。以前は#introを閉じた直後に表示していたため、③動画を
+// スクロール中の間もキャプションが出てしまい、動画自体のキャプションと
+// 位置が重なる問題があった）
 (function(){
   var fixedCaption = document.getElementById('fixed-caption');
-  var mockApp = document.getElementById('mock-app');
-  if (!('IntersectionObserver' in window)) return;
+  var photoArea = document.getElementById('scroll-slides');
+  if (!fixedCaption || !photoArea) return;
+  if (!('IntersectionObserver' in window)) { fixedCaption.classList.add('fixed-caption-show'); return; }
   var io2 = new IntersectionObserver(function(entries){
     entries.forEach(function(entry){
-      if (entry.isIntersecting) fixedCaption.classList.remove('fixed-caption-show');
+      fixedCaption.classList.toggle('fixed-caption-show', entry.isIntersecting);
     });
   }, { threshold: 0.2 });
-  io2.observe(mockApp);
+  io2.observe(photoArea);
 })();
 
 // ④スクロール連動のズームアウト：画面に入った写真だけ.revealedを付与
