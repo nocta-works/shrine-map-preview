@@ -114,6 +114,23 @@
     font-size: 12.5px; color: var(--gold-muted); text-align: center; line-height: 1.7; letter-spacing: 0.02em;
   }
 
+  /* ── 次の一社（出口）：読み終わった直後が行き止まりにならないようにする。
+     レベル1（地域が主役）なので、同じ東京の別の社へ横移動させる ── */
+  .next-shrines { max-width: 860px; margin: 72px auto 0; padding: 0 24px; }
+  .next-shrines-title { font-size: 13px; letter-spacing: 0.18em; color: var(--gold); opacity: 0.8; margin-bottom: 6px; }
+  .next-shrines-lead { font-size: 13px; line-height: 1.9; color: var(--tan-text); opacity: 0.7; margin: 0 0 22px; }
+  .next-shrine-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .next-shrine-card {
+    display: block; padding: 20px 22px; text-decoration: none;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border-4); border-radius: 3px;
+    transition: background var(--dur-base, .3s) ease, border-color var(--dur-base, .3s) ease;
+  }
+  .next-shrine-card:hover { background: rgba(var(--gold-glow-rgb),0.07); border-color: rgba(var(--gold-glow-rgb),0.45); }
+  .next-shrine-set { font-size: 10px; letter-spacing: 0.14em; color: var(--gold); opacity: 0.75; }
+  .next-shrine-name { display: block; font-size: 17px; color: var(--tan-text); margin: 8px 0 2px; }
+  .next-shrine-en { display: block; font-size: 11px; letter-spacing: 0.08em; color: var(--tan-text); opacity: 0.5; }
+  .next-shrine-why { font-size: 12px; line-height: 1.85; color: var(--tan-text); opacity: 0.72; margin: 12px 0 0; }
+  .next-shrines .shrine-links { margin: 34px auto 0; }
   .page-footer { text-align: center; padding: 40px; font-size: 11px; color: var(--border-4); }
 
   @media (prefers-reduced-motion: reduce) {
@@ -139,11 +156,6 @@
     <div class="shrine-meta">
       <span><b data-en="Enshrined Kami">御祭神</b><span data-en="Emperor Meiji and Empress Shoken">明治天皇・昭憲皇太后</span></span>
       <span><b data-en="Location">所在地</b><span data-en="Shibuya, Tokyo">東京都渋谷区</span></span>
-    </div>
-    <div class="shrine-links">
-      <a href="https://www.google.com/maps/search/明治神宮" target="_blank" rel="noopener" class="shrine-link gmaps" data-en="📍 Map">📍 地図</a>
-      <a href="https://www.google.com/search?q=明治神宮+公式" target="_blank" rel="noopener" class="shrine-link official" data-en="🌐 Official">🌐 公式</a>
-      <a href="https://ja.wikipedia.org/wiki/明治神宮" target="_blank" rel="noopener" class="shrine-link wiki">📖 Wiki</a>
     </div>
   </div>
 </div>
@@ -212,6 +224,36 @@
     <p class="photo-block-caption" data-en="Sake casks donated by breweries from across Japan, stacked along the approach — a sight unique to Meiji Jingu.">全国の蔵元から奉納された酒樽が参道脇に並ぶ、明治神宮ならではの光景。</p>
   </div>
 
+</div>
+
+<div class="next-shrines">
+  <div class="next-shrines-title" data-en="WHERE TO GO NEXT">次の一社</div>
+  <p class="next-shrines-lead" data-en="Both are notable shrines tied to Edo&#39;s history. Two stops on the same day as Meiji Jingu.">どちらも江戸の歴史と結びつく名社。明治神宮と同じ日に回れる距離にある。</p>
+  <div class="next-shrine-grid">
+    <a class="next-shrine-card" href="../index.html?shrine=神田神社（神田明神）#mock-app">
+      <span class="next-shrine-set" data-en="NOTABLE">名社</span>
+      <span class="next-shrine-name" data-en="Kanda Myojin">神田神社（神田明神）</span>
+      <span class="next-shrine-en" data-en="神田神社（神田明神）">Kanda Myojin</span>
+      <p class="next-shrine-why" data-en="The guardian shrine of old Edo, revered by the shogunate. Enshrines Taira no Masakado alongside two ancient kami — and today draws visitors praying for success in tech and business.">江戸総鎮守。将軍家の守護として崇敬された。大己貴命・少彦名命とともに平将門命を祀る。</p>
+    </a>
+    <a class="next-shrine-card" href="../index.html?shrine=日枝神社#mock-app">
+      <span class="next-shrine-set" data-en="NOTABLE">名社</span>
+      <span class="next-shrine-name" data-en="Hie Jinja">日枝神社</span>
+      <span class="next-shrine-en" data-en="日枝神社">Hie Jinja</span>
+      <p class="next-shrine-why" data-en="Tutelary shrine of Edo Castle — the grounds of today&#39;s Imperial Palace. Its Sanno Matsuri is counted among the three great festivals of Japan.">勅祭社・旧官幣大社。江戸城（皇居）の産土神で、山王祭は天下三大祭のひとつ。</p>
+    </a>
+  </div>
+  <a class="next-shrine-card" href="../area-pages/東京.html" style="margin-top:14px">
+    <span class="next-shrine-set" data-en="THE CITY">この街</span>
+    <span class="next-shrine-name" data-en="Shrines in Tokyo">東京の神社</span>
+    <span class="next-shrine-en" data-en="東京の神社">Shrines in Tokyo</span>
+    <p class="next-shrine-why" data-en="The three shrines of the city, and a day trip an hour south.">この街の三社、そして南へ1時間の日帰り先。</p>
+  </a>
+  <div class="shrine-links">
+    <a href="https://www.google.com/maps/search/明治神宮" target="_blank" rel="noopener" class="shrine-link gmaps" data-en="📍 Map">📍 地図</a>
+    <a href="https://www.google.com/search?q=明治神宮+公式" target="_blank" rel="noopener" class="shrine-link official" data-en="🌐 Official">🌐 公式</a>
+    <a href="https://ja.wikipedia.org/wiki/明治神宮" target="_blank" rel="noopener" class="shrine-link wiki">📖 Wiki</a>
+  </div>
 </div>
 
 <div class="page-footer">個別神社紹介ページ プロトタイプ・明治神宮 / design-lab（本番未反映）</div>

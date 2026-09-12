@@ -993,12 +993,25 @@ function initScrollSlideReveal() {
       });
       updateStats();
       renderSidebarList();
+      // 社を指定して地図を開く口（本人指定・2026-09-12・実装キュー依頼C）：
+      // 地域ページ／個別ページの「次の一社」カードから ?shrine=<名前> 付きで
+      // 遷移してきた場合、その社を選択済みの状態で開く。一致しなければ
+      // （まだ地図のデータに載っていない社を指す場合など）通常どおり全体を表示する
+      var focusedShrine = null;
+      var wantedShrineName = new URLSearchParams(location.search).get('shrine');
+      if (wantedShrineName) {
+        focusedShrine = shrines.filter(function(s){ return s.name === wantedShrineName; })[0] || null;
+      }
       function fitWhenReady(attempts) {
         attempts = attempts || 0;
         map.invalidateSize();
         var size = map.getSize();
         if ((size.x > 0 && size.y > 0) || attempts >= 30) {
-          map.fitBounds(bounds, { padding: [30,30] });
+          if (focusedShrine) {
+            focusShrine(focusedShrine);
+          } else {
+            map.fitBounds(bounds, { padding: [30,30] });
+          }
         } else {
           requestAnimationFrame(function(){ fitWhenReady(attempts + 1); });
         }
